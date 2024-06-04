@@ -1,0 +1,42 @@
+version: '3.9'
+
+
+services:
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    environment:
+      - NODE_ENV=production
+
+
+  backend:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://user:pass@db/dbname
+    depends_on:
+      - db
+
+  dev-db:
+    image: postgres:16.1-alpine3.19
+    restart: always
+    env_file:
+      - ./.env
+    ports:
+      - "5433:5432"
+    volumes:
+      - ./scripts:/docker-entrypoint-initdb.d
+    
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080          
+
+name: fastapi-development
