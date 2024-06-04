@@ -4,6 +4,7 @@
 > 기존에 학원에서 진행했던  미니 프로젝트 서버인 자바 스프링부트를 파이썬 fastapi 로 변경하고 리액트까지 최적화와 UI  개선 및 
 대부분의 코드를 수정 하였습니다. 
 
+![title](https://imagedelivery.net/6i45l_k8v6cNrhGva7A6BA/bd2933c9-c1d6-458c-54ae-d029c0ef1e00/medium)   
 
 
 ### 서비스 
