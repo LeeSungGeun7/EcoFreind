@@ -1,6 +1,6 @@
 # 에코프렌즈
 
-구글클라우드 배포 https://deno-front-sjdz3b63yq-du.a.run.app/
+구글클라우드 런 + 도커 배포 https://deno-front-sjdz3b63yq-du.a.run.app/
 
 
 > 기존에 학원에서 진행했던  미니 프로젝트 서버인 자바 스프링부트를 파이썬 fastapi 로 변경하고 리액트까지 최적화와 UI  개선 및 코드를 수정 
