@@ -1,10 +1,9 @@
-import React ,{useState , useEffect, useRef }from "react";
+import React ,{useState , useEffect }from "react";
 import Header from "../layout/Header";
-import Footer from "../layout/Footer";
 import styled , {css} from "styled-components";
 import KaKao from "../Components/KakaoMap";
-import AxiosApi from "../api/AxiosApi";
-import { useParams } from "react-router-dom";
+
+import { useNavigate, useParams } from "react-router-dom";
 import {  TbMoodCry , TbMoodHappy } from "react-icons/tb";
 import { FaStar } from "react-icons/fa";
 import Filter from "../Components/Filter";
@@ -12,7 +11,8 @@ import { TbMoodSearch } from "react-icons/tb";
 import {debounce} from "lodash";
 import { useGeoLocation } from "../utils/useGeoLocation";
 import { BiCurrentLocation } from "react-icons/bi";
-
+import { TbMessageChatbot } from "react-icons/tb";
+import { chargerApi } from "../api/charger";
 
 const center = `
 display: flex ;
@@ -136,14 +136,20 @@ const SelectItem = styled.li`
 
 
 const ChargerItem = ({ data , setSS }) => {
+  const navigate = useNavigate();
   const getFav = async () => {
-    
-    const res = await AxiosApi.getWishStations();
+
+    const res = await chargerApi.getWishStations();
     if (!res) return
-    if (res.status == 200) {
+    if (res.status === 200) {
       setFav(new Set(res.data))
     }
   }
+
+  const handleRoute = (id , name) => {
+      navigate(`/service/${id}/${name}`)
+  }
+
   useEffect(()=>{
     getFav()
   },[])
@@ -154,13 +160,13 @@ const ChargerItem = ({ data , setSS }) => {
   const handelFav = async (id) => {
     if (!fav.has(id)) {
       console.log(fav)
-      const res = await AxiosApi.addWishStation(id);
+      const res = await chargerApi.addWishStation(id);
 
        if (res && res === true){
           setFav(new Set([...fav,id]));
           }
     } else {
-       const res = await AxiosApi.delwishStation(id);
+       const res = await chargerApi.delwishStation(id);
        if (res && res === true) {
           const newFav = new Set(fav);
           newFav.delete(id);
@@ -178,6 +184,7 @@ const ChargerItem = ({ data , setSS }) => {
             <div>{item.station_name}</div>
             <div style={{fontSize:"11px"}}>{item.charger_type + "+" + item.charger_type_major}</div>
           </div>
+          <TbMessageChatbot onClick={()=>{handleRoute(item.id, item.station_name ? item.station_name : "이름없음")}}  style={{fontSize:"20px"}} />
           {
             item.user_restriction ==="이용가능" ? 
           <TbMoodHappy style={{backgroundColor:"",color:"skyblue"}}/> :
@@ -204,10 +211,10 @@ const { searchValue } = useParams();
 const [chargeData,setChargeData] = useState([])
 
 const fetchData = async () => {
-  const res = await AxiosApi.searchData("",searchValue ? searchValue : "","","",0)
+  const res = await chargerApi.searchData("",searchValue ? searchValue : "","","",0)
   
   console.log(res.data)
-  if (res.status == 200) {
+  if (res.status === 200) {
     setChargeData(res.data)
   }
 }
@@ -219,7 +226,7 @@ const [skip , setSkip] = useState(50)
 
 
 const moreData = async () => {
-  const res = await AxiosApi.searchData(
+  const res = await chargerApi.searchData(
     type.station_name,
     type.city,
     type.charger_method,
@@ -239,7 +246,7 @@ const moreData = async () => {
     timeout: 1000 * 10,
     maximumAge: 1000 * 3600 * 24,
   }          
-  const {location , error} = useGeoLocation(geolocationOptions)
+  const {location } = useGeoLocation(geolocationOptions)
 
 
 
@@ -256,13 +263,13 @@ const handleInput = debounce((e) => {
 
 const handleSearch = async () => {
   console.log(type.city);
-  const res = await AxiosApi.searchData(
+  const res = await chargerApi.searchData(
     type.station_name,
     type.city,
     type.charger_method,
     type.charger_type
     ,skip)
-    if (res.status == 200) {
+    if (res.status === 200) {
       setChargeData(res.data)
     }
 

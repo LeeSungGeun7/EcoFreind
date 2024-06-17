@@ -33,7 +33,6 @@ const Container = styled.div`
 
 
 const Layout = () => {
-
     return(
         <>
         <Header overlap={false}/>

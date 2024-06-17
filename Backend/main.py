@@ -1,11 +1,9 @@
-from fastapi import Request,Response ,FastAPI , Depends , HTTPException , File , UploadFile
+from fastapi import Request,Response ,FastAPI ,WebSocket, WebSocketDisconnect, Depends , File , UploadFile
 from sqlalchemy.orm import Session
-from typing import Literal , Set
 from app import crud , models , schemas
 from app.db_connection import SessionLocal , engine
 import csv
 import ast
-from sqlalchemy import exc
 from uuid import uuid4
 import secrets
 from core.redis_config import r 
@@ -14,6 +12,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from smtplib import SMTP_SSL
 from email.mime.text import MIMEText
 import random
+import aiohttp
+import asyncio
+
+
+
 
 
 OWN_EMAIL = "sungkeno3o@gmail.com"
@@ -42,6 +45,14 @@ app = FastAPI()
 models.Base.metadata.create_all(bind=engine)
 
 
+
+
+
+
+
+
+
+
 def get_db_session():
     db = SessionLocal()
     try:
@@ -57,6 +68,11 @@ def generate_session_id():
 session_data = {}
 
 origins = [
+    "https://deno-front-sjdz3b63yq-du.a.run.app",
+    "https://deno-front-sjdz3b63yq-du.a.run.app/serveice",
+    "https://deno-front-sjdz3b63yq-du.a.run.app:3000"
+    "https://deno-front-sjdz3b63yq-du.a.run.app/car",
+    "https://frontend-deno-sjdz3b63yq-uc.a.run.app:3000/car",
     "http://localhost",
     "http://localhost:3000",
     "http://localhost:3000/car"
@@ -72,10 +88,95 @@ app.add_middleware(
 
 
 
+count = 0 
+active_connections = []
+@app.websocket("/ws/{roomId}")
+async def websocket_endpoint(websocket: WebSocket, roomId: str, db: Session = Depends(get_db_session)):
+    await websocket.accept()
+    active_connections.append(websocket)
+
+    try:
+        async for data in websocket.iter_text():
+            user_id, message , name = data.split("|", 2)
+
+            # 연결이 종료되지 않은 경우에만 메시지 브로드캐스트
+            if websocket.application_state == websocket.application_state.CONNECTED:
+                for connection in active_connections:
+                    if connection.application_state == websocket.application_state.CONNECTED:
+                        await connection.send_text(f"{user_id},{message},{name}")
+
+            crud.send_message(user_id, roomId, message, db)
+
+    except WebSocketDisconnect:
+        active_connections.remove(websocket)
+
+        # 연결이 종료되지 않은 클라이언트에게만 메시지 전송
+        for connection in active_connections:
+            if connection.application_state == websocket.application_state.CONNECTED:
+                await connection.send_text("A client disconnected")
+
+    # WebSocket 연결 종료
+    await websocket.close()
+
+
 def generate_unique_code():
     digits = [str(i) for i in range(10)]
     code = ''.join(random.sample(digits, 6))
     return code
+
+
+@app.post('/callback/kakao')
+async def token(request: Request , db : Session = Depends(get_db_session)):
+    data = await request.json()
+    code = data.get('code')
+    async with aiohttp.ClientSession() as session:
+        headers = {"Content-Type": "application/x-www-form-urlencoded"}
+        data = {"grant_type": "authorization_code", "client_id": '077a5dc8a1b357781c172273b7c2d678', "redirect_uri": 'https://deno-front-sjdz3b63yq-du.a.run.app/callback/kakao', "code": code}
+        async with session.post("https://kauth.kakao.com/oauth/token", headers=headers, data=data) as response:
+            data = await response.json()
+        access_token = data.get('access_token')
+
+        headers = {"Authorization": f"Bearer {access_token}"}
+        async with session.get("https://kapi.kakao.com/v2/user/me", headers=headers) as rsp:
+            user_data = await rsp.json()
+
+        email = user_data.get('kakao_account', {}).get('email')
+        nickname = user_data.get('properties', {}).get('nickname')
+
+        isUser = crud.email_check(email , db)
+        if not isUser :
+            crud.sign_up_kakao(nickname,email,db)
+
+
+        user_datas = {"email":  email}
+        session_id = secrets.token_hex(32)
+        r.set(session_id, json.dumps(user_datas) )
+        r.expire(session_id, 13600)
+        return schemas.UserResponse(
+            userId= 1,
+            name = nickname,
+            email= email,
+            session_id=session_id,
+            user="로그인 작업"
+        )
+        return email , nickname , access_token
+
+
+@app.get('/get/message' )
+async def get_message( ct_id , db: Session = Depends(get_db_session)):
+    res = crud.get_messages(ct_id , db)
+
+    return res 
+
+
+
+@app.post('/send/message' , response_model= bool)
+async def send_message( body : schemas.RequestSendMessage , db: Session = Depends(get_db_session)):
+    res = crud.send_message(body.user_id , body.chargestation_id , body.message , db)
+
+    return res 
+
+
 
 
 
@@ -187,12 +288,14 @@ async def read_root(
     ):
 
     user = crud.get_user(db,user_data.email,user_data.password)
-    
+
     if user:
         session_id = secrets.token_hex(32)
         get_session(request, response, session_id,user_data)
 
         return schemas.UserResponse(
+            userId = user.id ,
+            name = user.name,
             email=user_data.email,
             session_id=session_id,
             user="로그인 작업"
@@ -202,6 +305,7 @@ async def read_root(
             "email" : "이메일@입력요망.com",
             "session_id" : "세션 생성 실패"
         }
+        
 
 @app.post('/user/password' , response_model= bool)
 async def isRight_password(request:Request , db : Session = Depends(get_db_session)):
@@ -218,12 +322,6 @@ async def isRight_password(request:Request , db : Session = Depends(get_db_sessi
 
 
 
-    
-@app.get('/is')
-async def ll():
-    rs = '598eedcc702113e08cd0c161f0e9aa9cf8a5771f05b8648ae7bf3abea652a595'    
-    s = r.get(rs)
-    return s
 
 
 

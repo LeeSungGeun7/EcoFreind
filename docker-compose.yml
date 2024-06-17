@@ -1,42 +1,83 @@
-version: '3.9'
+# version: '3.9'
+
+
+# services:
+
+#   frontend:
+#   build: 
+#     context: ./frontend
+#     dockerfile: Dockerfile
+#   ports:
+#     - "80:3000"
+#   depends_on:
+#     - backend
+#   environment:
+#     - NODE_ENV=production
+
+
+#   backend:
+#     build: ./Backend
+#     ports:
+#       - "8000:8000"
+#     environment:
+#       - DATABASE_URL=postgresql://user:pass@db/dbname
+#     depends_on:
+#       - db
+
+#   dev-db:
+#     image: postgres:16.1-alpine3.19
+#     restart: always
+#     env_file:
+#       - ./.env
+#     ports:
+#       - "5433:5432"
+#     volumes:
+#       - ./scripts:/docker-entrypoint-initdb.d
+    
+
+#   adminer:
+#     image: adminer
+#     restart: always
+#     ports:
+#       - 8080:8080          
+
+# name: fastapi-development
+# postgresql://user:pass@db/dbname
 
 
 services:
-
   frontend:
-    build: ./frontend
+    platform: linux/amd64
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
     ports:
-      - "80:80"
+      - "3000:3000"
     depends_on:
       - backend
     environment:
       - NODE_ENV=production
 
-
   backend:
-    build: ./backend
+    platform: linux/amd64
+    build: 
+      context: ./Backend
+      dockerfile: Dockerfile
     ports:
       - "8000:8000"
     environment:
-      - DATABASE_URL=postgresql://user:pass@db/dbname
-    depends_on:
-      - db
+      - DATABASE_URL=postgresql+psycopg2://postgres:postgres@/inventory?host=/cloudsql/resolute-bloom-425908-b1:asia-northeast3:deno
 
-  dev-db:
-    image: postgres:16.1-alpine3.19
-    restart: always
-    env_file:
-      - ./.env
-    ports:
-      - "5433:5432"
-    volumes:
-      - ./scripts:/docker-entrypoint-initdb.d
-    
+
+
+
+ 
 
   adminer:
+    platform: linux/amd64
     image: adminer
     restart: always
     ports:
-      - 8080:8080          
+      - 8080:8080
 
-name: fastapi-development
+     

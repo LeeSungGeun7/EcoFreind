@@ -1,24 +1,8 @@
-import React, { useState,useContext,useEffect, useRef,useAuth } from "react";
+import React, { useState, useRef } from "react";
 import styled from "styled-components";
-import vd from "../images/KakaoTalk_Video_2023-05-03-16-40-25.mp4";
-import vd2 from "../images/KakaoTalk_Video_2023-05-03-16-40-25.mp4";
 import vd3 from "../images/original-087fcdef6dd7e801b337d6dbdc8c0ba9.mp4";  
-import CardSlider from "../Components/CardSlider";
-import News from "../Components/News";
 import {  useNavigate} from "react-router-dom"; 
-import ImageSlider from "../Components/ImageSlider";
 import { FaSearch } from 'react-icons/fa';
-import CarSearch from "../pages/CarSearch";
-
-import AxiosApi from "../api/AxiosApi";
-import cookie from 'react-cookies'; 
-import axios from "axios";
-
-
-
-
-import MainBottom from "../Components/MainBottom";
-import Mainitem from "./Mainitem";
 
 
 const Mainst = styled.main`
@@ -28,19 +12,15 @@ const Mainst = styled.main`
     justify-content:center;
     align-items:center;
   .top {
-    //padding: 50px;
     display: flex;
     justify-content:center;
     align-items:center;
-   // grid-column: 1 / 3;
     background-color: black;
     background-repeat: no-repeat;
     background-size: contain;
     border-radius: 15px;
     width: 90.5%;
     height: 90vh;
-
-    // border: solid 1px black;
   }
   .top video {
     object-fit: cover;
@@ -105,8 +85,6 @@ const Mainst = styled.main`
   }
   .mainitem {
     border-radius: 15px;
-
-   // border: solid 1px;
     width: 92.5%;
     height: 100vh;
     overflow: hidden;
@@ -130,22 +108,11 @@ const Main = () => {
         }
       }
   
-      const images = [
-        { image: "https://i.pinimg.com/474x/d4/a4/46/d4a44668707dcd5e14dffff6d5436a44.jpg", text: '충전이 어려우시다구요?' },
-        
-        
-        
-      ];
      
 
 
   const [vdValue, setVdValue] = useState(vd3);
-  const vdClick = () => {
-    setVdValue(vd2);
-    if (vdValue === vd2) {
-      setVdValue(vd);
-    }
-  };
+ 
 
 
 

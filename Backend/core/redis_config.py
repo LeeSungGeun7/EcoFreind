@@ -4,9 +4,15 @@ import redis
 
 load_dotenv()
 
-REDIS_HOST = str = os.getenv("REDIS_HOST")
-REDIS_PORT = integer = os.getenv("REDIS_PORT")
-REDIS_DATABASE = integer = os.getenv("REDIS_DATABASE")
+REDIS_HOST = 'redis-17562.c294.ap-northeast-1-2.ec2.redns.redis-cloud.com'
+REDIS_PORT = 17562
+REDIS_DATABASE = '9jhZJtkps1qvCFnlbLRccbmsVbAx21X1'
+
+#os.getenv("REDIS_HOST")
+
+REDIS_HOST = str = REDIS_HOST
+REDIS_PORT = integer = REDIS_PORT
+REDIS_DATABASE = integer = REDIS_DATABASE
 
 # r = redis.Redis(
 #     host=REDIS_HOST,

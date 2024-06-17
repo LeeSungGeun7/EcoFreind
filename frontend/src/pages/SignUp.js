@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import Header from "../layout/Header";
 import arrow from "../images/right-arrow.png"
 import AxiosApi from "../api/AxiosApi";
 import { useLocation, useNavigate } from "react-router-dom";
-import axios from "axios";
 import { z } from 'zod';
+import { authApi } from "../api/auth";
 
 
 const Container = styled.div`
@@ -27,7 +27,7 @@ const Container = styled.div`
   }
   .signUp {
     width: 450px;
-    height: 780px;
+    height: 1000px;
     background-color: white;
     padding: 0 50px;
     margin-bottom: 20px;
@@ -163,7 +163,7 @@ const SignUp = () => {
 		gender : z.string().min(1,"성별을 선택해주세요") ,
 		phone : z.string().min(10,"핸드폰 번호를 입력해주세요"),
 		address: z.string().min(1,"주소를 입력해주세요"),
-		password: z.string().min(8).regex(/[A-Z]/, "비밀번호에 대문자가 필요합니다"),
+		password: z.string().min(10).regex(/^(?=.*[a-zA-Z])(?=.*\d)/, "비밀번호는 영문자와 숫자가 포함되어야 합니다"),
 		emailcheck: z.boolean(),
 	  })
 	  .refine(data => data.emailcheck === true, {
@@ -184,8 +184,6 @@ const SignUp = () => {
 
 	const [keyConfirm, setKeyConfirm] = useState(false);
 
-
-	const location = useLocation();
 
 	// 이메일 정규식 확인
 	const onChangeEmail = (e) => {
@@ -237,7 +235,7 @@ const SignUp = () => {
 	  try {
 		SignUpSchema.parse(formData);
 		
-		const res = await AxiosApi.signUP(formData)
+		const res = await authApi.signUP(formData)
 		if (res.status === 200){
 			if (res.data) {
 				alert("회원가입이 완료 되었습니다.")
@@ -262,7 +260,7 @@ const SignUp = () => {
 	}
 
 	const onClickGetKey = async () => {
-		const res = await AxiosApi.codesend(formData.email);
+		const res = await authApi.codesend(formData.email);
 		if(res.status === 200) {
 			alert('인증메일이 발송 되었습니다.')
 			setKeyConfirm(true)
@@ -346,10 +344,11 @@ const SignUp = () => {
 						<Input
 							name="password"
 							type="password"
-							placeholder="영문자, 숫자, 특수문자를 포함한 8~25자"
+							placeholder="영문자, 숫자, 10~25자"
 							value={formData.password}
 							onChange={onChangePwd}
 						/>
+						{errors.password && <p>{errors.password}</p>}
 						{/* {formData.pwd.length > 0 && <span className={`${pwdReg ? "success" : "error"}`}>{pwMessage}</span>} */}
 					</div>
 					<div className="inputBox">

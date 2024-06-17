@@ -1,18 +1,11 @@
 import React from 'react';
-import {useState , useContext} from "react";
-import { useNavigate } from "react-router-dom";
+import {useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import Header from "../layout/Header";
 import Footer from "../layout/Footer";
 import styled from "styled-components";
-import AxiosApi from "../api/AxiosApi";
-
-import cookies from 'react-cookies';
-import debounce from "lodash/debounce"
-
-import { GoogleLogin } from "@react-oauth/google";
-import { GoogleOAuthProvider } from "@react-oauth/google";
-import jwtDecode from "jwt-decode";
 import { useAuth } from '../context/AuthContextProvider';
+import { authApi } from '../api/auth';
 
 
     
@@ -50,6 +43,20 @@ const Container = styled.div`
     border-radius: 5%;
     border-width: 30%;
 
+
+    .top {
+      width: 100%;
+      display: flex;
+      justify-content: space-around;
+
+      div {
+        width: 33%;
+      }
+      .sign {
+        font-size:13px;
+      }
+
+    }
   }
   input {
     @media (max-width: 600px) {
@@ -66,15 +73,16 @@ const Container = styled.div`
     padding-left: 20px;
     background-color: white;
   }
-  button {
+  .login-btn {
     //#30A7FE;
    
     border-radius: 10%;
-    background-color:  #F5F278;
+    background-color:  lightblue;
     border : none;
     width: 15%;
     height:10%;
     cursor: pointer;
+    
   }
   .title {
     font-size: 20px;
@@ -82,13 +90,26 @@ const Container = styled.div`
   }
   a {
     text-decoration: none;
-    color: #333333;
+    color: #3
   }
+
+  .kakao {
+    display:flex;
+    justify-content:center;
+    height: 50px;
+    width: 50px;
+    background-color: #FEE500;
+    border-radius: 15px;
+    img {
+      width: 100%;
+      height:100%;
+    }
+  }
+
 `
+
 const Login = () => {
     const {userdata , setUserData} = useAuth()
-    
-   const clientId = "157067894615-cai8h2gq8gatlmoqpkfe08os9rhq92vp.apps.googleusercontent.com";
     const navigate = useNavigate(); // 라우터 이동을 하기위해서
     // 키보드 입력
     const [inputId , setInputId] = useState("");
@@ -107,12 +128,12 @@ const Login = () => {
     
 
   const onClickLogin = async() => {
-    const {data:sessionId , status: status} = await AxiosApi.memberLogin(inputId,inputPw)
+    const { data:sessionId , status} = await authApi.memberLogin(inputId,inputPw)
     
     console.log(JSON.stringify(sessionId))
-    if (status == 200) {
+    if (status === 200) {
       localStorage.setItem('session_id', JSON.stringify(sessionId))
-      setUserData({...userdata,islogin:true,email: sessionId.email})
+      setUserData({...userdata,islogin:true,email: sessionId.email,name: sessionId.name , userId : sessionId.userId})
       navigate('/')
     } else {
       alert("로그인실패")
@@ -129,24 +150,20 @@ const Login = () => {
       <div className="Container">
 
         <div className="loginbar">
-          <div className="title">LOGIN</div>
+
+          <div className='top'>
+            <div></div>
+            <div className="title">LOGIN</div>
+            <Link className='sign' onClick={(e)=>{e.preventDefault(); navigate("/signup")}}>Sign Up</Link>
+          </div>
+
           <input type="text" placeholder="이메일 입력" value={inputId} onChange={onChangeId} />
           <input type="password" placeholder="비밀번호 입력" value={inputPw} onChange={onChangePw} />
-          <button onClick={onClickLogin}>Login</button>
-          <a onClick={()=>{navigate("/findpass")}}>Forgot to Password?</a>
-          <GoogleOAuthProvider clientId={clientId}>
-            <GoogleLogin
-              onSuccess={async(res) => {
-                const result = await AxiosApi.googlelogin(res.credential);
-                console.log(jwtDecode(res.credential));
-                console.log(result);
-                navigate("/signUp", {state : { data : jwtDecode(res.credential)}});
-              }}
-              onFailure={(err) => {
-                console.log(err);
-              }}
-/>
-          </GoogleOAuthProvider>
+          <button className='login-btn' onClick={onClickLogin}>Login</button>
+          
+          <Link className='kakao' to={`https://kauth.kakao.com/oauth/authorize?client_id=${process.env.REACT_APP_KAKAO_REST_API_KEY}&redirect_uri=${process.env.REACT_APP_KAKAO_REDIRECT_URI}&response_type=code`}>
+            <img src="https://imagedelivery.net/6i45l_k8v6cNrhGva7A6BA/e695240c-9c41-4098-9724-4b741c70ca00/avatar" alt="" />
+          </Link>  
 
         </div>
       </div>

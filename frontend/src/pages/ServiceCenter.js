@@ -1,306 +1,248 @@
-import React, { useState } from "react";
-import { Link, Navigate, useNavigate } from "react-router-dom";
+import React, { useEffect, useRef, useState } from "react";
 import Header from "../layout/Header";
 import Footer from "../layout/Footer";
 import styled from "styled-components";
-import { SlEarphonesAlt } from "react-icons/sl";
-import { FaSearch } from 'react-icons/fa';
+import { useParams } from "react-router-dom";
+import { BsEmojiSunglasses  } from "react-icons/bs";
+import { HiOutlineEmojiSad } from "react-icons/hi";
 
-import { useContext } from "react";
-import { useAuth } from "../context/AuthContextProvider";
+import { elapsedTime } from "../utils/time";
+import { chatApi } from "../api/chat";
+import { userApi } from "../api/user";
 
 
-const Contain = styled.div`
-    background-color:#EFF2F3;
-    .Container {
+const center = `
+    display:flex;
+    justify-content: space-evenly;
+    align-items: center;
+`
 
-        display : flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        height: 150vh;
-       // border-top : solid 1px #333333;
-        font-family: 'Do Hyeon', sans-serif;
+const Message = styled.div`
+    display:flex;
+    ${center};
+    flex-direction: ${props => props.role  ? 'row':"row-reverse"};
+    
+    width: 100%;
+    white-space: normal;
+    .content {
+     background-color :  ${props => props.role  ? '#F9F871':"white"};
+     width: 80%;   
+     margin : 15px;
+     padding: 8px;
+     ${center}
+     flex-wrap: wrap;
+     border-radius : 10px;   
+     white-space : normal; 
+     height: auto; 
+     min-height: 50px; 
+    }
+   
+
+    .time {
+        ${center}
+        margin:5px;
     }
 
-    .top {
-
-        background-color: white;
-        display: flex;
-        align-items: center;
-        justify-content:center;
-        width: 70%;
-        height: 10%;
-      //  border: solid 1px black;
-        color : #333333;
-        font-family: 'Do Hyeon', sans-serif;
-        font-size: 35px;
-        weight : bold;
-    }
-
-    .mid {
-        // background-image: url("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR9y8Eyh7fgV9hJo8YzDPg7n-Zmu4pgp7ncu04PFJJGFa8COiMjK_QLDXdgWQsAoNiLFw&usqp=CAU") ;
-        background-size: 100% 100%;
-        background-color: #72DEFF;        
-        background-repeat: no-repeat;
-        width: 70%;
-        height: 20%;
-        align-items:center;
-        display:flex;
-        justify-content:center;
-        flex-direction: row;
-      
-      //  border: solid 1px black;
-        margin-bottom: 50px;
-    }
-
-    .bottom {
-        width: 70%;
-        height: 60%;
-     //   border: solid 1px black;
-    }
-
-
-    .top  , .bottom {
-        display: flex;
-        align-items: center;
-        justify-content:center;
-        flex-direction:column;
-    }
-
-    .live-chat , .FAQ , .custom , .post{
-        display:flex;
-        flex-direction: row;
-        width:100%;
-        height: 25%;
-    }
-    .live-chat1 , .custom-name , .post1{
-        font-weight:bold;
-        width: 30%;
-    }
-    .live-chat2 , .custom-box , .post2{
-        width: 70%;
-    }
-    .live-chat2 button {
-        width: 10%;
-        border:none;
-        background-color: black;
-        color: white;
-    }
-
-    .FAQ1 {
-        font-weight:bold;
-        width: 30%;
-    }
-    .FAQ2 , .live-chat2{
-        display:flex;
-        flex-direction: column;
-        width: 70%;
-
-    }
-    .FAQ2 {
-        height: 100%;
+    .user-name {
         position: relative;
-    }
-    .FAQ2 input {
-        
-        border : none;
-        width: 50%;
-        border-bottom: solid 1px;
-    }
-    .Search {
-       position: absolute;
-        right: 340px;
-    }
-    .custom-box {
-        height:100%;
-        display:flex;
-        flex-direction:row;
-    }
-
-    .custom-item1 , .custom-item2 {
-        display:flex;
-        align-items:center;
-        justify-content:center;
+        ${center}
         flex-direction:column;
-        background-color: beige;
-        width: 45%;
-        height: 95%;
-        margin-right:10px;
-       // border: 1px solid black;
+        border-radius: 30px;
+        width: 80px;
+        height: 40px;
+        background-color :  ${props => props.role  ? '#F9F871':"white"};
     }
-
-    .custom-item1:hover{
-
-    color: rgb(255, 255, 102);
-    filter: drop-shadow(0 0 2px rgba(255, 255, 102, 0.7))
-    drop-shadow(0 0 5px rgba(255, 255, 102, 0.7))
-    drop-shadow(0 0 15px rgba(255, 255, 102, 0.7));
-    }
-
-    .questions {
-        overflow : scroll;
-        height:60%;
-    }
-    @media (max-width: 1000px) {
-        * {
-            font-size: 0.8em;
-        }
-    }
-    @media (max-width: 480px) {
-            * {
-                font-size: 0.4em;
-            }
-    }
- 
 `
 
 
-  
+const Container = styled.div`
+    weight : 100vw;
+    height: 100vh;
+    ${center}
+    flex-direction: column;
+    background-color : #00D2FC;
+
+    .title {
+        height: 20px;
+        color : white;
+        font-size: 30px;
+        margin : 30px;
+    }
+    .body {
+        overflow: scroll;
+        background-color: none;
+        width: 80%;
+        height: 80%;
+    }
+
+
+    .send {
+        display:flex;
+        width: 80%;
+        height: 50px;
+        border-radius: 30px;
+        input , button  {
+            border:none;
+            padding:10px;
+            border-radius: 15px;;
+            width: 80%;
+        }
+        button {
+            margin: 10px;
+            color: white;
+            background-color : black ;
+            width: 20%;
+        }
+    }
+
+
+
+    .user {
+        display:flex;
+        flex-direction: row;
+        button {
+            margin:20px;
+            border : none ; 
+            border-radius : 50px;
+            background-color : white;
+            height: 50px;
+
+            &:hover {
+                color:white;
+                background-color: black;
+            }
+        }
+    }
+`
+
+
+
+
+// 고유 ID 충전소 실시간 채팅방 
+// 충전 상태 , 소통
+// 
 
 const ServiceCenter = () => {
-    const [isLoggedIn,setIsLoggedIn] = useState(false);
-    const navigate = useNavigate();
-    const {email} = useAuth();
+    const { id , name } = useParams();
+    
+    const [currentUser , setCurrentUser] = useState({
+        name : "ff" ,
+        id : 0 , 
+    })
+    const [messages, setMessages] = useState([]);
+    const [inputText, setInputText] = useState('');
+    const [connected, setConnected] = useState(false);
+    const ws = useRef(null);
 
+    const getChatMessage = async () => {
+        const res = await chatApi.getMessages(id)
+        if (res.status === 200) {
+            setMessages(res.data)
+        }
+    }
+    const getUserData = async () => {
+        const res = await userApi.getCustomerInfo()
+        if (res.status ===200 ) {
+            setCurrentUser({...currentUser , name : res.data.name , id : res.data.id})
+            return true
+        }
+    }
+
+    useEffect(() => {
+        getChatMessage();
+        getUserData();
+
+
+        const socket = new WebSocket(`wss://backend-deno-sjdz3b63yq-du.a.run.app/ws/${id}`);
+        
+        socket.onopen = () => {
+          console.log('WebSocket connected');
+          setConnected(true);
+        };
+    
+        socket.onmessage = (event) => {
+          const message = event.data;
+          const r = message.split(',')
+          setMessages(prev => [...prev, {message : r[1] , user : {name : r[2] },created_at : new Date() }  ]);
+        
+        };
+        
+        socket.onerror = (error) => {
+          console.error('WebSocket error:', error);
+        };
+    
+        socket.onclose = () => {
+          console.log('WebSocket disconnected');
+          setConnected(false);
+        };
+        
+        ws.current = socket;
+    
+        return () => {
+          socket.close();
+        };
+    
+      }, []);
+    
+    const sendMessage = (e) => {
+        e.preventDefault();
+        if (inputText && ws.current.readyState === WebSocket.OPEN) {
+            const messageData = `${currentUser.id}|${inputText}|${currentUser.name}`;
+            ws.current.send(messageData);
+          setInputText('');
+        }
+    }; 
+    
+
+    const sendTemp = (type) => {
+        setInputText(type === 1 ? '이용 가능해요' : '이용이 안되요')
+        if (inputText && ws.current.readyState === WebSocket.OPEN) {
+            const messageData = `${currentUser.id}|${inputText}|${currentUser.name}`;
+            ws.current.send(messageData);
+          setInputText('');
+        }
+    }
+    
+
+// id , message , user , created_at
     return(
         <>
         <Header/>
-        <Contain>
-            
-            <div className="Container">
+            <Container>
+                <div className="title">{name}</div>
+                <p>참여자 : {currentUser.id}</p>
+                <div className="body"> 
+                {
+                    messages.map((item,idx)=>{
+                        return(
+                            <Message role={item.user.name === currentUser.name}  key={idx}>
+                                <div className="content">{item.message}</div>
+                                <div className="avatar">
+                                    <div className="user-name">{item.user.name ? item.user.name : item}</div>
+                                    <div className="time">{elapsedTime(item.created_at)}</div>  
+                                </div>
 
-
-                    <div className="top">고객센터
-                    
-                    
+                            </Message>
+                        )
+                    })
+                }
+                </div>
+                <div className="send">
+                    <input onKeyPress={(e)=>{if(e.key==="Enter"){sendMessage(e)}}} onChange={(e)=>{setInputText(e.target.value)}} value={inputText} type="text" />
+                    <button onClick={(e)=>{sendMessage(e)}}>SEND</button>
+                </div>
+                <div className="user">
+                    <div>
+                        <BsEmojiSunglasses/>
+                        <button onClick={()=>{sendTemp(1)}}>이용 가능해요</button>
                     </div>
-
-
-                
-                    <div className="mid">
-
-                        <div style={{minWidth:"10%",fontSize:"2.5em"}}>24시간 연중무휴 채팅상담</div>
-                        <div style={{color: "white",marginLeft: "120px" , fontSize: "100px"}}>< SlEarphonesAlt/></div>
+                    <div>
+                        <HiOutlineEmojiSad/>
+                        <button onClick={()=>{sendTemp(2)}}>이용이 안되요</button>
                     </div>
-
-                  <div className="bottom"> 
-        
-                        <div className="live-chat">
-                                <div className="live-chat1">
-                                    에코프렌즈 라이브챗
-                                </div>
-                                <div className="live-chat2">
-                                    L I V E C H A T
-                                    <p style={{fontSize: "10px"}}>상담원과 실시간으로 상담을 해보세요</p>
-                                    <button>상담하기</button>
-                                </div>
-                        </div>
-
-                        <div className="FAQ">
-
-                                 <div className="FAQ1">
-                                    FAQ    
-                                </div>  
-                                <div className="FAQ2">
-                                    <input type="text" />
-                                    자주하는 질문 
-                                        <div className="questions">
-                                            <div className="question">
-                                                (회원가입이 안되요!)
-                                            </div>
-                                            <div className="question">
-                                                (로그인이안되요!)
-                                            </div>
-                                            <div className="question">
-                                                (!)
-                                            </div>
-                                            <div className="question">
-                                                (구글회원가입은어떻게해야되나요!)
-                                            </div>
-                                            <div className="question">
-                                                (전기차충전은 어떻게하나요!)
-                                            </div>
-                                            <div className="question">
-                                                (서비스센터 수리점도알려주세요!)
-                                            </div>
-                                        </div>
-                                    <div className="Search"><FaSearch/></div>
-                                </div> 
-                        </div>
-
-                        <div className="custom">
-
-                                <div className="custom-name">
-                                    1:1문의
-                                </div>
-                        
-
-
-                 {!isLoggedIn ? (
-                      <div className="custom-box">
-                                   
-                      <div onClick={()=> {navigate("/check")}} style={{backgroundColor: "#FFE83C"}} className="custom-item1">
-
-                          1:1문의 및 조회
-                          <p style={{fontSize:"10px" , backgroundColor: "#FFE83C"}}>궁금한 점이 있으시면 1:1문의를 남겨주세요</p>
-                          <p style={{fontSize:"5px" , fontWeight: "100"}}>^&^</p>
-                      </div>
-                      <div onClick={()=> {navigate("/answer")}} className="custom-item2" style={{backgroundColor: "#C2FF30"}}>
-                          관리자전용-답변달기-기능
-                      </div>
-                  </div>
-                ) : (
-                   <div className="custom-box">
-                                   
-                  <div style={{backgroundColor: "#FFE83C"}} className="custom-item1">
-
-                        1:1문의하기 (로그인후 이용가능)
-                       
-                    </div>
-                    <div className="custom-item2" style={{backgroundColor: "#C2FF30"}}>
-                        문의내역 조회 (로그인후 이용가능)
-                    </div>
-                        </div>
-                    
-                )}
-
-
-                                {/* <div className="custom-box">
-                                   
-                                    <div style={{backgroundColor: "#FFE83C"}} className="custom-item1">
-
-                                        1:1문의하기
-                                        <p style={{fontSize:"10px" , backgroundColor: "#FFE83C"}}>궁금한 점이 있으시면 1:1문의를 남겨주세요</p>
-                                        <p style={{fontSize:"5px" , fontWeight: "100"}}>로그인후 이용가능</p>
-                                    </div>
-                                    <div className="custom-item2" style={{backgroundColor: "#C2FF30"}}>
-                                        문의내역 조회
-                                    </div>
-                                </div> */}
-
-                        </div>  
-
-                        <div className="post">
-                        
-                                <div className="post1">
-                                    <div>
-                                        공지사항
-                                    </div>
-                                </div>
-
-                                <div className="post2">
-                                    <div>5/9 오후 7:00 (개인정보 처리방침이 변경되었습니다.)</div>
-                                </div>
-
-                        </div>  
-                    </div>    
-
-
-            </div>
+                </div>
+            </Container>
         <Footer/>
-
-        </Contain>
         </>
     );
 }

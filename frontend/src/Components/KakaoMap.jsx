@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
-import styled, {css} from 'styled-components';
-import markerimg from '/Users/sk/dev/Frontend/React_Project/ecofriends/React/src/images/marker.png'
+import styled from 'styled-components';
+import markerimg from '../images/marker.png'
 
 
 

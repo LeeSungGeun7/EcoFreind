@@ -1,6 +1,6 @@
 from pydantic import BaseModel, EmailStr 
-from typing import List, Set
-from datetime import date
+from typing import  Set , Optional
+from datetime import datetime , date
 
 
 
@@ -20,20 +20,56 @@ class SignUpRequsest(BaseModel):
     address : str 
 
    
+class UserSchema(BaseModel):
+    id: int
+    name: str
+
+    class Config:
+        orm_mode = True
+        from_attributes=True
 
 
+class RequestSendMessage(BaseModel):
+    message: str
+    user_id: int
+    chargestation_id: int
+    
+
+class MessageOut(BaseModel):
+    id: int
+    message: str
+    user: Optional[UserSchema]
+    created_at: datetime
+
+    class Config:
+        orm_mode = True
+
+
+class Message(BaseModel):
+    id: Optional[int] = None
+    message: str
+    created_at: datetime
+    user_id: int
+    chargestation_id: int
+    user: Optional[UserSchema] = None
+
+
+
+    class Config:
+        orm_mode = True
+        from_attributes=True
 
 class User(BaseModel):
 
-
+    id : int
     name : str
     email : str
     password : str
     gender : str
     phone : str
     addr :  str
-    created_at : date
-    favorite_station_ids : Set[int] = set()
+    created_at : datetime
+    favorite_station_ids : Optional[Set[int]] = None
     
     class Config:
         orm_mode = True
@@ -96,6 +132,8 @@ class UserCreateRequest(BaseModel):
 class UserResponse(BaseModel):
     email: EmailStr
     session_id: str
+    name : str
+    userId : int
 
 
 

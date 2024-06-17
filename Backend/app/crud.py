@@ -1,10 +1,9 @@
 from sqlalchemy.orm import Session
 from . import models , schemas
 from geoalchemy2.functions import ST_DWithin, ST_MakePoint
-from sqlalchemy import cast, Numeric , String , func , or_ , distinct
-import pandas as pd
-
-
+from sqlalchemy import cast, Numeric , String , func , distinct
+from datetime import datetime , timedelta
+from typing import List, Tuple
 
 
 latitude = 37.4052
@@ -32,6 +31,19 @@ def sign_up_user(body , db:Session):
     db.refresh(user)
     return True 
 
+def sign_up_kakao(nickname: str, email: str, db: Session):
+    user = models.User(
+        name=nickname+"d",
+        email=email,
+        phone="입력 해주세요",  # 전화번호는 빈 문자열로 설정
+        addr="입력 해주세요",  # 주소도 빈 문자열로 설정
+        gender="입력 해주세요",  # 성별도 빈 문자열로 설정
+        password="323.ㅇ9924%%##$!"  # 비밀번호도 빈 문자열로 설정
+    )
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    return True
 
 
 def get_userdata(email , db:Session) -> schemas.User:
@@ -39,6 +51,44 @@ def get_userdata(email , db:Session) -> schemas.User:
     if user is None:
         return 
     return schemas.User.from_orm(user)
+
+
+
+
+def get_messages(ct_id: int, db: Session) -> Tuple[List[schemas.MessageOut]]:
+    messages = db.query(models.Message).filter(models.Message.chargestation_id == int(ct_id)).order_by(models.Message.created_at).all()
+    user_ids = [message.user_id for message in messages]
+    users = db.query(models.User).filter(models.User.id.in_(user_ids)).all()
+    user_schemas = [schemas.UserSchema.from_orm(user) for user in users]
+    print(len(user_schemas))
+    return [
+        schemas.MessageOut(
+            id=message.id,
+            message=message.message,
+            created_at=message.created_at,
+            user= message.user
+        )
+        for message in messages
+    ]
+
+
+def send_message(user_id , ct_id , text , db:Session):
+
+    utc_now = datetime.utcnow()
+    korea_now = utc_now + timedelta(hours=9)
+    message = models.Message(
+        message = text,
+        user_id = user_id,
+        chargestation_id = ct_id,
+        created_at=korea_now
+    )
+    db.add(message)
+    db.commit()
+    db.refresh(message)
+    return True 
+
+
+
 
     
 def get_wishstation(email, db: Session, skip=0, limit=15) -> list[schemas.chargetStations]:

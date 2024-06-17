@@ -9,6 +9,7 @@ from alembic import context
 config = context.config
 
 
+
 url_devdb = os.environ.get("DEV_DATABASE_URL")
 
 if config.config_file_name is not None:

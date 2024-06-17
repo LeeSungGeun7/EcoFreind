@@ -2,14 +2,11 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import Header from "../layout/Header";
 import Footer from "../layout/Footer";
-import { Link, useParams } from "react-router-dom";
-import AxiosApi from "../api/AxiosApi";
-import cookies from 'react-cookies';
 import { FaStar } from "react-icons/fa";
-
-import DataModal from "../Components/DataModal";
 import { FaCaretDown ,FaCaretUp} from "react-icons/fa";
 import { z } from 'zod';
+import { chargerApi } from "../api/charger";
+import { userApi } from "../api/user";
 
 const center = `
 display: flex;
@@ -170,7 +167,7 @@ const Item = styled.div`
 
 
 
-const MyInfoItem = ({on , favdata , setFavData , name , content , data}) => {
+const MyInfoItem = ({on ,keys, favdata , setFavData , name , content , data}) => {
 
     const handleFav = (id , type ) => {
     const newD = favdata.map((e) => {
@@ -183,7 +180,7 @@ const MyInfoItem = ({on , favdata , setFavData , name , content , data}) => {
     }
     return (
 
-            <Item key={data&& data.id} >
+            <Item key={keys} >
                 <div className="name">
                     {name}
                 </div>
@@ -202,7 +199,6 @@ const MyInfoItem = ({on , favdata , setFavData , name , content , data}) => {
     )
 }
 
-const passwordSchema = z.string().min(5).max(30)
 
 
 
@@ -210,7 +206,7 @@ const Mypage = () => {
     const [password ,setPassword] = useState("");
 
     const handelFav = async (id) => { {
-        const res = await AxiosApi.delwishStation(id);
+        const res = await chargerApi.delwishStation(id);
         if (res && res === true) {
             const data = favdata.filter((e)=> e.id !== id)
             setFavData(data);
@@ -218,7 +214,7 @@ const Mypage = () => {
     }
     }
     const isRightPassword = async () => {
-        const res = await AxiosApi.isRightPassword(password)
+        const res = await userApi.isRightPassword(password)
         if (res.status === 200 && res.data ) {
             setHidden(true);
         } else {
@@ -226,12 +222,12 @@ const Mypage = () => {
         }
     }
     
-    const [menu , setMenu] = useState(3)
+    const [menu , setMenu] = useState(2)
     const [userdata,setUserData] = useState({})
     const [favdata,setFavData] = useState([])
 
     const fetchData = async () => {
-        const res = await AxiosApi.getCustomerInfo()
+        const res = await userApi.getCustomerInfo()
         if (res.status === 200) {
             setUserData(res.data)
             console.log(res);
@@ -239,7 +235,7 @@ const Mypage = () => {
     }
 
     const fetchFav = async () => {
-        const res = await AxiosApi.getWishStation()
+        const res = await chargerApi.getWishStation()
         if (res.status === 200) {
             setFavData([...res.data, {isClick:false}])
         }
@@ -269,23 +265,26 @@ const Mypage = () => {
             <Main>
                     
                     {
-                        menu == 1 &&
+                        menu === 1 &&
                     <MyInfo >
                          <MyInfoItem on={false} key={1} name="이름" content={userdata.name}/> 
-                         <MyInfoItem key={2} name="성별" content={userdata.gender == 'M' ? "남자" : "여자"}/> 
+                         <MyInfoItem key={2} name="성별" content={userdata.gender === 'M' ? "남자" : "여자"}/> 
                          <MyInfoItem key={3} name="주소" content={userdata.addr}/> 
                          <MyInfoItem key={4} name="핸드폰" content={userdata.phone}/> 
                          <MyInfoItem key={5} name="가입일" content={userdata.created_at}/> 
                     </MyInfo>
                     }
                     {
-                        menu == 2 && 
+                        menu === 2 && 
                         <MyInfo >
                             {
                                 favdata.map((item,idx)=>{
+                                    if (idx === favdata.length - 1 && !item.station_name) {
+                                        return null; 
+                                      }
                                     return(
                                         <>
-                                        <MyInfoItem on={true} favdata={favdata} setFavData={setFavData} data={item}  key={idx} name={<FaStar onClick={()=>{handelFav(item.id)}} style={{color: "skyblue" }}/>} content={item.station_name}/>
+                                        <MyInfoItem on={true} favdata={favdata} setFavData={setFavData} data={item}  keys={item.id} name={<FaStar onClick={()=>{handelFav(item.id)}} style={{color: "skyblue" }}/>} content={item.station_name}/>
                                             {
                                             item.isClick &&
                                             <Infodetail>
@@ -312,7 +311,7 @@ const Mypage = () => {
                     }
 
                     {
-                        menu == 3 && !hidden && 
+                        menu === 3 && !hidden && 
                         <form action="">
                             <div>비밀번호 확인</div>
                             <div>
@@ -323,7 +322,7 @@ const Mypage = () => {
                     }
 
                     {
-                        menu == 3 && hidden && 
+                        menu === 3 && hidden && 
                         <form action="">
 
                             ddsss

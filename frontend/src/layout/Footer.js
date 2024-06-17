@@ -85,19 +85,7 @@ const Footerst = styled.footer`
         <Footerst>
         <footer>
           <div className="div1">
-            <nav>
-              <ul>
-                <li>
-                  <a onClick={() => handleOpenModal(0)}>개인정보처리방침</a>
-                </li>
-                <li>
-                  <a onClick={() => handleOpenModal(1)}>이메일무단수집거부</a>
-                </li>
-                <li>
-                  <a onClick={() => handleOpenModal(2)}>저작권정책</a>
-                </li>
-              </ul>
-            </nav>
+            
           </div>
           <div className="div2">
             <h2>ECO FRIEND</h2>

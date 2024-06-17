@@ -1,21 +1,16 @@
 
-import React , {useContext, useState} from "react";
+import React  from "react";
 import styled  from "styled-components";
-import { Link , useNavigate} from "react-router-dom"; 
+import { useNavigate} from "react-router-dom"; 
 import MyPageBtn from "../Components/MyPageBtn";
 import { useEffect } from "react";
-import AxiosApi from "../api/AxiosApi";
 import { useAuth } from "../context/AuthContextProvider";
-
-
-
+import { authApi } from "../api/auth";
 
 const center = `
 display:flex;
 justify-content: center;
 align-items:center;`
-
-
 
 const Container = styled.div`
     display:flex;
@@ -97,8 +92,8 @@ const Header = (props) => {
     const {userdata , setUserData} = useAuth()
 
     const handleLogout = async () => {
-       const res =  await AxiosApi.logout()
-       if (res.status == 200) {
+       const res =  await authApi.logout()
+       if (res.status === 200) {
           localStorage.removeItem('session_id')
           setUserData({...userdata, islogin:false , email: ''})  
        }
@@ -116,7 +111,7 @@ const isExist = async () => {
     console.log(session)
     if (session_ && session && session !== undefined) {
       try {
-        const res = await AxiosApi.isExist(session);
+        const res = await authApi.isExist(session);
         if (res.data === true) {
           setUserData({...userdata,islogin:true})  
         } else {
@@ -133,12 +128,12 @@ const isExist = async () => {
 
 
 useEffect(()=>{
+
     isExist();
 },[])    
 
 
     
-
     return(
         <Container overlap={props.overlap} > 
 
@@ -167,12 +162,7 @@ useEffect(()=>{
             <Menu>
             <button style={{height:"30px", width:"60px"}} onClick={()=>{navigate('/login')}} className="logout">로그인</button>   
             </Menu>
-
             }
-
-            
-
-            
         </Container>
     );
 };
