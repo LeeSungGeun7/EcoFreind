@@ -1,0 +1,62 @@
+name: Deploy to Google Cloud Run
+
+env:
+  BACKEND_SERVICE_NAME: backend-deno
+  FRONTEND_SERVICE_NAME: deno-front
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+    types:
+      - closed
+
+jobs:
+  dockerize-and-deploy:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Google Cloud Auth
+        uses: 'google-github-actions/auth@v2'
+        with:
+          project_id: ${{ secrets.PROJECT_ID }}
+          credentials_json: ${{ secrets.PROJECT_CREDENTIALS }}
+
+      - name: Set up Cloud SDK
+        uses: 'google-github-actions/setup-gcloud@v2'
+
+      - name: Configure Docker
+        run: |
+          gcloud auth configure-docker ${{ secrets.PROJECT_REGION }}-docker.pkg.dev
+
+      - name: Build and Push Backend Docker Image
+        run: |
+          docker buildx build --platform linux/amd64 -t "${{ secrets.PROJECT_REGION }}-docker.pkg.dev/${{ secrets.PROJECT_ID }}/${{ secrets.REGISTRY_NAME }}/${{ secrets.BACKEND_DOCKER_IMAGE_NAME }}:${{ github.sha }}" -f Backend/Dockerfile .
+          docker push "${{ secrets.PROJECT_REGION }}-docker.pkg.dev/${{ secrets.PROJECT_ID }}/${{ secrets.REGISTRY_NAME }}/${{ secrets.BACKEND_DOCKER_IMAGE_NAME }}:${{ github.sha }}"
+
+      - name: Build and Push Frontend Docker Image
+        run: |
+          docker buildx build --platform linux/amd64 -t "${{ secrets.PROJECT_REGION }}-docker.pkg.dev/${{ secrets.PROJECT_ID }}/${{ secrets.REGISTRY_NAME }}/${{ secrets.FRONTEND_DOCKER_IMAGE_NAME }}:${{ github.sha }}" -f frontend/Dockerfile .
+          docker push "${{ secrets.PROJECT_REGION }}-docker.pkg.dev/${{ secrets.PROJECT_ID }}/${{ secrets.REGISTRY_NAME }}/${{ secrets.FRONTEND_DOCKER_IMAGE_NAME }}:${{ github.sha }}"
+
+      - name: Deploy Backend to Cloud Run
+        run: |
+          gcloud run deploy ${{ env.BACKEND_SERVICE_NAME }} \
+            --image=${{ secrets.PROJECT_REGION }}-docker.pkg.dev/${{ secrets.PROJECT_ID }}/${{ secrets.REGISTRY_NAME }}/${{ secrets.BACKEND_DOCKER_IMAGE_NAME }}:${{ github.sha }} \
+            --region=${{ secrets.PROJECT_REGION }} \
+            --platform=managed \
+            --allow-unauthenticated
+
+      - name: Deploy Frontend to Cloud Run
+        run: |
+          gcloud run deploy ${{ env.FRONTEND_SERVICE_NAME }} \
+            --image=${{ secrets.PROJECT_REGION }}-docker.pkg.dev/${{ secrets.PROJECT_ID }}/${{ secrets.REGISTRY_NAME }}/${{ secrets.FRONTEND_DOCKER_IMAGE_NAME }}:${{ github.sha }} \
+            --region=${{ secrets.PROJECT_REGION }} \
+            --platform=managed \
+            --allow-unauthenticated
