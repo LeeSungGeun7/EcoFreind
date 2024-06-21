@@ -216,7 +216,7 @@ const fetchData = async () => {
 const [skip , setSkip] = useState(0)
 
 const {location  , error : geoError } = useGeoLocation()
-
+//ㅅㄷㄴ
 
 // 채팅페이지에서 복귀후 데이터 관리
 useEffect(()=>{  
