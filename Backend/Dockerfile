@@ -24,19 +24,19 @@
 FROM python:3.12.1
 
 # 작업 디렉토리 설정
-WORKDIR /app/backend
+WORKDIR /app/Backend
 
 # 현재 디렉토리 내용 확인 (디버깅용)
 RUN ls -la
 
 # requirements.txt 파일 복사
-COPY backend/requirements.txt .
+COPY Backend/requirements.txt .
 
 # 패키지 설치
 RUN pip install -r requirements.txt
 
 # 나머지 백엔드 파일 복사
-COPY backend/ .
+COPY Backend/ .
 
 # 애플리케이션 실행
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
