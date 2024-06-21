@@ -30,9 +30,7 @@ const ChargerItem = ({data , setLoc }) => {
   
     useEffect(()=>{
       getFav()
-      // return () => {
-      //   localStorage.removeItem('storedData')
-      // }
+      
   
     },[])
   
