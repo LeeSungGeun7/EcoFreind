@@ -19,9 +19,7 @@ const ChargerItem = ({data , setLoc }) => {
         setFav(new Set(res.data))
       }
     }
-//   data -> 로컬스토리지에 저장할때 object Object 의도하지않게 동작 
-//   해결 -> const dataString = data.map((e)=>{return JSON.stringify(e)}); 
-//   데이터를 순회하여 JSON.stringify 해서 해결
+
     const handleRoute = (id , name) => {
         localStorage.setItem('storedData', JSON.stringify(data));
         localStorage.setItem('scrollItem' , id);
