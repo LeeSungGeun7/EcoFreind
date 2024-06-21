@@ -2,6 +2,7 @@ import axios from "axios";
 import { EF_DOMAIN, getSessionId } from './utils';
 
 
+
 export const userApi = {
 // 회원조회
 getCustomerInfo : async() => {

@@ -1,18 +1,18 @@
-import React ,{useState , useEffect }from "react";
+import React ,{useRef,memo,useState , useEffect }from "react";
 import Header from "../layout/Header";
 import styled , {css} from "styled-components";
 import KaKao from "../Components/KakaoMap";
-
-import { useNavigate, useParams } from "react-router-dom";
-import {  TbMoodCry , TbMoodHappy } from "react-icons/tb";
-import { FaStar } from "react-icons/fa";
+import ChargerItem from "../Components/ChargerItem";
+import { useLocation, useNavigate, useParams  } from "react-router-dom";
 import Filter from "../Components/Filter";
 import { TbMoodSearch } from "react-icons/tb";
 import {debounce} from "lodash";
-import { useGeoLocation } from "../utils/useGeoLocation";
+import { useGeoLocation } from "../hooks/useGeoLocation";
 import { BiCurrentLocation } from "react-icons/bi";
-import { TbMessageChatbot } from "react-icons/tb";
 import { chargerApi } from "../api/charger";
+import SkeletonLoader from "../Components/SkeletonLoader";
+import useIntersectionObserver from "../hooks/useIntersectionObserver";
+import { useCallback } from "react";
 
 const center = `
 display: flex ;
@@ -20,18 +20,39 @@ justify-content: center;
 align-items : center;
 `
 
-
-
 const Container = styled.div`
   display: flex ;
   justify-content: center;
   flex-direction: column;
+  @media (min-width: 1000px) {
+    flex-direction: row-reverse;
+  } 
   align-items : center;
   padding : ${props => props.padding};
   height: ${props => props.h};
   width: ${props => props.w};
   background-color: white ;
   position : relative;
+
+  .kakao {
+    @media (min-width: 1000px) {
+      width: 100%;  
+    } 
+    height: 100%;
+  }
+
+  .group {
+    width: 100%;
+    display: flex ;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    @media (min-width: 1000px) {
+      height: 100%;  
+    }
+    height: 70%;
+
+  }
 
   .filter {
     width: 40px;
@@ -45,11 +66,20 @@ const Container = styled.div`
     z-index : 20;
     font-size: 2rem;
   }
-  button {
+  .btn-group {
+    position: absolute;
+    bottom: 5px ;
+    right: 30px;
+    z-index : 20;
+    font-size: 2rem;
+    display : flex;
+    width: auto;
+  }
+  /* button {
     border : none ;
     border-radius: 15px;
     background-color: white;
-  }
+  } */
 `
 
 
@@ -57,11 +87,16 @@ const ListContainer = styled.div`
   justify-content: center;
   height: 100%;
   width: 90%;
+
+  @media (min-width: 1000px) {
+      width: 100%;  
+  } 
+
   background-color: silver;
   overflow-y: scroll;
 `
 
-const Item = styled.div`
+export const Item = styled.div`
   display: flex;
   justify-content: space-evenly;
   align-items : center;
@@ -87,12 +122,15 @@ const Item = styled.div`
 
 const SelectBox = styled.div`
   width: 90%; 
+  @media (min-width: 1000px) {
+      width: 100%;  
+  } 
   height : 50px;
   ${center}
   justify-content: space-evenly;
   background-color: skyblue ;
   color:white;
-
+  z-index: 2;
   input {
     width: 30%;
     border: none;
@@ -124,6 +162,7 @@ padding: 5px;
 `
 
 
+
 const SelectItem = styled.li`
     border-radius: 15px;
     height: 50px;
@@ -135,146 +174,65 @@ const SelectItem = styled.li`
 `
 
 
-const ChargerItem = ({ data , setSS }) => {
-  const navigate = useNavigate();
-  const getFav = async () => {
+const MeterBtn = styled.button`
+      border : none ;
+      border-radius: 15px;
+      background-color: skyblue;
+      ${props => props.val === true && css`
+      background-color: black;
+      color:white;
+      `}   
+      :hover {
+        background-color: black;
+        color:white;
+      }
+`
 
-    const res = await chargerApi.getWishStations();
-    if (!res) return
-    if (res.status === 200) {
-      setFav(new Set(res.data))
-    }
-  }
-
-  const handleRoute = (id , name) => {
-      navigate(`/service/${id}/${name}`)
-  }
-
-  useEffect(()=>{
-    getFav()
-  },[])
-
-
-  const [fav , setFav] = useState(new Set([]))
-  
-  const handelFav = async (id) => {
-    if (!fav.has(id)) {
-      console.log(fav)
-      const res = await chargerApi.addWishStation(id);
-
-       if (res && res === true){
-          setFav(new Set([...fav,id]));
-          }
-    } else {
-       const res = await chargerApi.delwishStation(id);
-       if (res && res === true) {
-          const newFav = new Set(fav);
-          newFav.delete(id);
-          setFav(newFav);
-       }
-    }
-  }
-
-  return (
-    <>
-      {data.map((item, idx) => (
-        <Item  key={idx}>
-          <FaStar onClick={()=>{handelFav(item.id)}} style={{color: fav.has(item.id) ? "yellow" : "silver" }}/>
-          <div onClick={()=>{setSS({lat:item.latitude , lng:item.longitude})}} className="title">
-            <div>{item.station_name}</div>
-            <div style={{fontSize:"11px"}}>{item.charger_type + "+" + item.charger_type_major}</div>
-          </div>
-          <TbMessageChatbot onClick={()=>{handleRoute(item.id, item.station_name ? item.station_name : "이름없음")}}  style={{fontSize:"20px"}} />
-          {
-            item.user_restriction ==="이용가능" ? 
-          <TbMoodHappy style={{backgroundColor:"",color:"skyblue"}}/> :
-            <TbMoodCry/>
-          }
-        </Item>
-      ))}
-    </>
-  );
-};
+const NotResult = styled.div`
+  display : none;
+  ${props => props.val === true && css`
+      ${center} 
+      height: 100%;
+      background-color: white ;
+  `}   
+`
 
 
 
-
-
-
-
-
-const CarSerach = () => {
+const CarSerach = memo(() => {
 const { searchValue } = useParams();
-
-
-
+const [loading , setLoading] = useState(false);
 const [chargeData,setChargeData] = useState([])
 
 const fetchData = async () => {
+  setLoading(true)
   const res = await chargerApi.searchData("",searchValue ? searchValue : "","","",0)
-  
-  console.log(res.data)
   if (res.status === 200) {
     setChargeData(res.data)
   }
+  setLoading(false)
 }
 
-const [skip , setSkip] = useState(50)
+const [skip , setSkip] = useState(0)
+
+const {location  , error : geoError } = useGeoLocation()
 
 
-
-
-
-const moreData = async () => {
-  const res = await chargerApi.searchData(
-    type.station_name,
-    type.city,
-    type.charger_method,
-    type.charger_type
-    ,skip)
-  if (res.status === 200) {
-    setChargeData((prevChargeData) => [...prevChargeData, ...res.data]);
+// 채팅페이지에서 복귀후 데이터 관리
+useEffect(()=>{  
+  const stored = localStorage.getItem('storedData');
+  if(stored){
+    setChargeData(JSON.parse(stored))
   }
-  setSkip(skip+50)
-
-}
-
-
-
-  const geolocationOptions = {
-    enableHighAccuracy: true,
-    timeout: 1000 * 10,
-    maximumAge: 1000 * 3600 * 24,
-  }          
-  const {location } = useGeoLocation(geolocationOptions)
-
-
-
-useEffect(()=>{
+  else {
   fetchData();  
+  }
 },[])
 
 
 const handleInput = debounce((e) => {
   setType({...type , city: e.target.value , station_name: e.target.value});
 },200)
-
-
-
-const handleSearch = async () => {
-  console.log(type.city);
-  const res = await chargerApi.searchData(
-    type.station_name,
-    type.city,
-    type.charger_method,
-    type.charger_type
-    ,skip)
-    if (res.status === 200) {
-      setChargeData(res.data)
-    }
-
-}
-
 
 
  const [filterOpen,setFilterOpen]= useState(false)
@@ -286,29 +244,110 @@ const handleSearch = async () => {
     city : "",
  })
     
- const [ss,setSS] = useState({
-    lat : 37.394776,
-    lng : 127.11116,
- })
+
+const [loc , setLoc] = useState({
+  latitude : 37.394776,
+  longitude : 127.11116,
+  meter : 1000
+})
+
+
+
+// 데이터 페칭 
+const handleSearch = useCallback( async (isMore = false) => {
+  alert(JSON.stringify(loc))
+  if (!isMore) setSkip(0);
+  const res = await chargerApi.searchData(
+    type.station_name,
+    type.city,
+    type.charger_method,
+    type.charger_type,
+    skip,
+    loc.latitude,
+    loc.longitude,
+    loc.meter
+  );
+  if (isMore) {
+    if (res.status === 200) {
+      setChargeData((prevChargeData) => [...prevChargeData, ...res.data]);
+    }
+  } else {
+    if (res.status === 200) {
+      setChargeData(res.data);
+    }
+  }
+},[type.station_name, type.city, type.charger_method, type.charger_type, skip, loc]
+);
+
+const moreData = async () => {
+  setSkip(prevSkip => prevSkip + 1);
+  handleSearch(true);
+};
+
+
+
+// 무한 스크롤 하단감지
+const target = useRef(null);
+
+const intersectionCallback = (entries, observer) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+     moreData();
+      }
+    });
+};
+
+useIntersectionObserver(target, intersectionCallback);
+
+
+const setMeter = (newMeter) => {
+  setLoc((prevLoc) => ({ ...prevLoc, meter: newMeter }));
+};
+
+
+
+
+
+// 스크롤 복귀 
+const listRef = useRef(null)
+const scrollItem = localStorage.getItem('scrollItem')
+
+useEffect(() => {
+  if (scrollItem && listRef.current) {
+    const selectedElement = document.getElementById(`chargeItem-${scrollItem}`);
+    if (selectedElement) {
+      selectedElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }
+}, [chargeData]);
+
+
 
     return (
       <>
-    <Header overlap={false}/>
-      
+    <Header overlap={false}/> 
       <Container  w={'100vw'} h={'100vh'}>
 
-        <Container w={'90%'} h={'50%'}>
-         <BiCurrentLocation className="geo-button" onClick={()=>{
 
+        {/* 카카오맵 */}
+        <Container className="kakao" w={'90%'} h={'50%'}>
+          <div className="btn-group">
+            <MeterBtn val={loc.meter===500} onClick={()=>{setMeter(loc.meter === 500 ? 0 : 500) }}  className="">500m</MeterBtn>
+            <MeterBtn val={loc.meter=== 1000} onClick={()=>{setMeter(loc.meter ===1000 ? 0 : 1000)}}  className="">1km</MeterBtn>
+            <MeterBtn val={loc.meter===3000} onClick={()=>{setMeter(loc.meter === 3000 ? 0 : 3000)}} className="">3km</MeterBtn>
+          </div>
+         <BiCurrentLocation className="geo-button" onClick={()=>{
           if (location) {
-            setSS({lat : location.latitude , lng : location.longitude})
+            setLoc({latitude : location.latitude , longitude : location.longitude});
           }
           }}>X</BiCurrentLocation>
-          <KaKao chargerInfo={chargeData} Lat={ss.lat} Lng={ss.lng}/>
+          <KaKao loc={loc} chargerInfo={chargeData} Lat={loc.latitude} Lng={loc.longitude}/>
         </Container>
 
+        {/* 셀렉 박스 */}
+        <div className="group">
           <SelectBox>
-              <input onKeyPress={(e) => {if (e.key === 'Enter') { handleSearch();}}} placeholder="지역 or 충전소명" defaultValue={type.station_name}  onChange={(e)=>{handleInput(e)}} maxLength={30} type="text" />
+              <input onKeyPress={(e) => {if (e.key === 'Enter') { handleSearch();}}} placeholder="지역 or 충전소명" onChange={(e) => handleInput(e)} maxLength={30} type="text" />
               <TbMoodSearch onClick={()=>{handleSearch()}} className="filter"/> 
               <SelectMenu>
                   타입
@@ -329,19 +368,27 @@ const handleSearch = async () => {
               </SelectMenu>
           </SelectBox>
 
-         <ListContainer>
+          {/* 아이템 리스트 */}
+         <ListContainer ref={listRef}  >          
+            <NotResult val={!loading &&chargeData.length === 0}>
+                앗 검색결과가 없어요
+            </NotResult>
+            {
+              loading ?
+              <SkeletonLoader/>
+              :
+            <ChargerItem setChargeData={setChargeData} setLoc={setLoc} data={chargeData}/> 
+            }
+            <div style={{display: loading ? 'hidden' : 'block', height:'10px'}} ref={target}></div>
             
-            <ChargerItem setSS={setSS} data={chargeData}/>
-
           </ListContainer> 
-          <button onClick={()=>{moreData()}}>more</button>
-        
+        </div>
          
       </Container>
         <Filter isOpen={filterOpen}  />        
-     {/* <Footer/> */}
+
       </>
     );    
-  };
+  });
 
 export default CarSerach;

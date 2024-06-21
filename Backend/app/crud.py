@@ -1,13 +1,19 @@
 from sqlalchemy.orm import Session
 from . import models , schemas
-from geoalchemy2.functions import ST_DWithin, ST_MakePoint
-from sqlalchemy import cast, Numeric , String , func , distinct
+from geoalchemy2.functions import ST_DWithin, ST_MakePoint,ST_DistanceSphere,ST_SetSRID
+from geoalchemy2 import Geography
+from sqlalchemy import cast, Numeric , String , func , distinct , Float
 from datetime import datetime , timedelta
 from typing import List, Tuple
 
 
-latitude = 37.4052
-longitude = 127.0854
+
+
+
+
+
+
+
 distance_meters = 100000
 
 
@@ -189,7 +195,7 @@ def get_stations(db: Session , skip: int = 0 , limit: int = 100):
                 cast(models.ChargeStation.latitude, Numeric),
                 4326
             ),
-            ST_MakePoint(longitude, latitude,4326), 
+            ST_MakePoint(37.465828, 127.132397,4326), 
             distance_meters)
     ).offset(skip).limit(limit).all()
 
@@ -209,8 +215,22 @@ def group_stations(stations):
 def search_stations(search_request ,db: Session ):
     search_term = f"%{search_request.city}%"
     query = db.query(models.ChargeStation).filter(
-        func.lower(models.ChargeStation.city).like(func.lower(search_term))
+        func.lower(models.ChargeStation.address).like(func.lower(search_term))
     )
+  
+  
+    print(search_request.lng, search_request.lat,search_request.meter)
+    if search_request.lng is not None and search_request.meter != 0 :
+        point = func.geography(ST_SetSRID(ST_MakePoint(search_request.lng, search_request.lat), 4326))
+
+        query = db.query(models.ChargeStation).filter(
+            ST_DWithin(
+                func.geography(ST_SetSRID(ST_MakePoint(models.ChargeStation.longitude, models.ChargeStation.latitude), 4326)),
+                point,
+                search_request.meter
+            )
+        )
+
     if search_request.type != "":
         query = query.filter(models.ChargeStation.charger_type == search_request.type)  
     if search_request.speed != "":

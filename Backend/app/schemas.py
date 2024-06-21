@@ -82,6 +82,7 @@ class FavStation(User):
     class Config:
         orm_mode : True
 
+ 
 
 
 
@@ -95,11 +96,10 @@ class chargeStation(BaseModel):
     charger_type_major : str
     charger_type_minor : str
     operator_minor : str
-    rapid_charge_capacity : str
     charger_type : str
     user_restriction : str
-    latitude : float
-    longitude : float
+    latitude : float or None 
+    longitude : float or None
 
     class Config:
         orm_mode = True
@@ -113,6 +113,9 @@ class searchRequest(BaseModel):
     type : str or None 
     speed : str or None 
     skip : int or 0
+    lat : Optional[float] = None
+    lng : Optional[float] = None
+    meter : Optional[int] = None
 
 class chargetStations(chargeStation):
     id : int

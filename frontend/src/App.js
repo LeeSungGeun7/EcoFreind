@@ -19,9 +19,9 @@ function App() {
   return (
    <>
    <Router>
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<Layout/>}>
       <Routes>
-      <Route path="/Car" element={<CarSerach/>} />
+      <Route path="/Car" element={<CarSerach/>}/>
         <Route path="/Car/:searchValue" element={<CarSerach/>} />
         <Route path="/login" element={userdata.islogin? <Layout/>:<Login />} />
         <Route path="/signup" element={userdata.islogin ?<Layout/> : <SignUp />} />

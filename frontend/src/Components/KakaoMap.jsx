@@ -12,7 +12,7 @@ const Maker = styled.div`
 
 
 
-function KakaoMap({ chargerInfo , Lat , Lng }) {
+function KakaoMap({loc ,chargerInfo , Lat , Lng }) {
   const mapContainer = useRef(null);
   const map = useRef(null); // map 객체를 저장할 ref를 추가
   
@@ -23,6 +23,8 @@ function KakaoMap({ chargerInfo , Lat , Lng }) {
         level: 4,
       };
       map.current = new window.kakao.maps.Map(mapContainer.current, mapOption) // map 객체를 ref에 저장
+
+      
 
       const createMarkers = () => {
         const positions = chargerInfo.map((data) => ({
@@ -44,6 +46,24 @@ function KakaoMap({ chargerInfo , Lat , Lng }) {
             title: position.title,
             image: markerImage,
           });
+
+
+          const mark = 'https://img.icons8.com/?size=100&id=oRy0heGDK8Bg&format=png&color=000000'
+          const userImg = new window.kakao.maps.MarkerImage(mark, imageSize);
+          if (loc) {
+            const a = {
+              title: 'dd',
+              latlng: new window.kakao.maps.LatLng(loc.latitude, loc.longitude),
+              map: map.current
+            };
+            const marker = new window.kakao.maps.Marker({
+              map: map.current,
+              position: a.latlng,
+              title: 'user',
+              image: userImg,
+            });
+          }
+        
 
         const overlayId = `overlay_${index}`;  
         const content =  `
@@ -92,6 +112,7 @@ function KakaoMap({ chargerInfo , Lat , Lng }) {
     if (map.current) {
       const moveLatLon = new window.kakao.maps.LatLng(Lat, Lng);
       map.current.setCenter(moveLatLon);
+      console.log('dd')
     }
 
   }, [Lat, Lng]);

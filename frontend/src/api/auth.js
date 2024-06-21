@@ -4,6 +4,7 @@ import { EF_DOMAIN } from './utils';
 
 
 
+
 export const authApi =  {
     signUP: async (request) => {
         const response = await axios.post(EF_DOMAIN + "/signup", {

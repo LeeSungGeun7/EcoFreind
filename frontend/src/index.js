@@ -8,6 +8,7 @@ import 'slick-carousel/slick/slick-theme.css';
 import { AuthContextProvider } from './context/AuthContextProvider';
 
 
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
 

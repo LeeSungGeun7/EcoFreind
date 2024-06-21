@@ -27,7 +27,7 @@ const Container = styled.div`
   }
   .signUp {
     width: 450px;
-    height: 1000px;
+    height: auto;
     background-color: white;
     padding: 0 50px;
     margin-bottom: 20px;
@@ -205,7 +205,7 @@ const SignUp = () => {
 
 	// 중복확인
 	const onClickEmailCheck = async () => {
-		const res = await AxiosApi.emailcheck(formData.email)
+		const res = await authApi.emailcheck(formData.email)
 		if (res.status=== 200) {
 			if (res.data) {
 				setErrors({...errors, email: "이미 존재 하는 이메일 입니다."})
@@ -216,7 +216,7 @@ const SignUp = () => {
 	}
 
 	const emailcodeCheck = async () => {
-		const res = await AxiosApi.codecheck(formData.email,keyCode)
+		const res = await authApi.codecheck(formData.email,keyCode)
 		if (res.status === 200) {
 			if (res.data) {
 				alert('확인 되었습니다.')

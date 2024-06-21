@@ -1,6 +1,10 @@
 import { useState, useEffect } from 'react'
 
-
+const geolocationOptions = {
+  enableHighAccuracy: true,
+  timeout: 1000 * 10,
+  maximumAge: 1000 * 3600 * 24,
+}   
 
 export const useGeoLocation =  (options = {}) => {
   const [location, setLocation] = useState()
@@ -26,9 +30,9 @@ export const useGeoLocation =  (options = {}) => {
       setError('Geolocation is not supported.')
       return
     }
+    console.log('test')
+    geolocation.getCurrentPosition(handleSuccess, handleError, geolocationOptions)
+  }, [])
 
-    geolocation.getCurrentPosition(handleSuccess, handleError, options)
-  }, [options])
-
-  return { location, error }
+  return { location, error  }
 }

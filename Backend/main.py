@@ -84,7 +84,9 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+
 )
+
 
 
 
@@ -406,7 +408,7 @@ async def addFav(request:Request,db: Session = Depends(get_db_session)):
         print(f"Error: {e}")
         return False
 
-@app.post('/delfav', response_model=bool)
+@app.delete('/delfav', response_model=bool)
 async def delFav(request:Request,db: Session = Depends(get_db_session)):
     data = await request.json()
     session_id = data.get('session_id')

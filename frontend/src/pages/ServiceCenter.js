@@ -2,10 +2,10 @@ import React, { useEffect, useRef, useState } from "react";
 import Header from "../layout/Header";
 import Footer from "../layout/Footer";
 import styled from "styled-components";
-import { useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { BsEmojiSunglasses  } from "react-icons/bs";
 import { HiOutlineEmojiSad } from "react-icons/hi";
-
+import { IoMdArrowRoundBack } from "react-icons/io";
 import { elapsedTime } from "../utils/time";
 import { chatApi } from "../api/chat";
 import { userApi } from "../api/user";
@@ -61,6 +61,13 @@ const Container = styled.div`
     ${center}
     flex-direction: column;
     background-color : #00D2FC;
+
+    .back-btn {
+        padding:5px;
+        margin-right: auto;
+        width: 50px;
+        height: 50px;
+    }
 
     .title {
         height: 20px;
@@ -124,7 +131,8 @@ const Container = styled.div`
 
 const ServiceCenter = () => {
     const { id , name } = useParams();
-    
+    const location = useLocation();
+    const navigate = useNavigate();
     const [currentUser , setCurrentUser] = useState({
         name : "ff" ,
         id : 0 , 
@@ -147,11 +155,10 @@ const ServiceCenter = () => {
             return true
         }
     }
-
+    
     useEffect(() => {
         getChatMessage();
         getUserData();
-
 
         const socket = new WebSocket(`wss://backend-deno-sjdz3b63yq-du.a.run.app/ws/${id}`);
         
@@ -202,15 +209,23 @@ const ServiceCenter = () => {
           setInputText('');
         }
     }
-    
+
+    useEffect(()=>{
+        return () => {
+            setTimeout(()=>{
+                localStorage.removeItem('storedData')
+                localStorage.removeItem('scrollItem')
+            },[1000])
+        }
+    },[])
 
 // id , message , user , created_at
     return(
         <>
         <Header/>
             <Container>
+                <IoMdArrowRoundBack className="back-btn" onClick={()=>{navigate(-1)}}>{'<'}</IoMdArrowRoundBack>
                 <div className="title">{name}</div>
-                <p>참여자 : {currentUser.id}</p>
                 <div className="body"> 
                 {
                     messages.map((item,idx)=>{
