@@ -29,7 +29,7 @@ delwishStation: async (itemId) => {
   const session_id = getSessionId()
     try {
       const response = await fetch(EF_DOMAIN + "/delfav", {
-        method: 'POST',
+        method: 'DELETE',
         body: JSON.stringify({ session_id: session_id ,itemId }), 
       });
       const data = await response.json();
