@@ -38,10 +38,10 @@
     content="
     default-src 'self' 'unsafe-inline' https://dapi.kakao.com http://*.daumcdn.net;
     script-src 'self' 'unsafe-inline' https://dapi.kakao.com http://*.daumcdn.net;
-    img-src 'self' 'unsafe-inline' https://dapi.kakao.com http://*.daumcdn.net https://imagedelivery.net https://img.icons8.com;
+    img-src 'self' 'unsafe-inline' https://dapi.kakao.com http://*.daumcdn.net https://imagedelivery.net/* https://img.icons8.com/*;
     style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
     font-src 'self' https://fonts.gstatic.com;
-    connect-src 'self' https://backend-deno-sjdz3b63yq-du.a.run.app;
+    connect-src 'self' https://backend-deno-sjdz3b63yq-du.a.run.app wss://backend-deno-sjdz3b63yq-du.a.run.app;
     "
     >
     <title>React App</title>
