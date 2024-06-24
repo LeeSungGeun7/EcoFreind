@@ -72,6 +72,7 @@ origins = [
     "https://deno-front-sjdz3b63yq-du.a.run.app/serveice",
     "https://deno-front-sjdz3b63yq-du.a.run.app:3000"
     "https://deno-front-sjdz3b63yq-du.a.run.app/car",
+    "https://deno-front-sjdz3b63yq-du.a.run.app/callback/kakao",
     "https://frontend-deno-sjdz3b63yq-uc.a.run.app:3000/car",
     "http://localhost:3000",
     "http://127.0.0.1:3000",
