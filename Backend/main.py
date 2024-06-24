@@ -155,8 +155,8 @@ async def token(response : Response,request: Request , db : Session = Depends(ge
         session_id = secrets.token_hex(32)
         r.set(session_id, json.dumps(user_datas) )
         r.expire(session_id, 13600)
-        response.set_cookie(key="session_id", value=session_id, httponly=True,samesite="lax",
-        secure=True , max_age=13600 , domain="sjdz3b63yq-du.a.run.app")
+        response.set_cookie(key="session_id", value=session_id, httponly=True,samesite="none",
+        secure=True , max_age=13600 )
         return schemas.UserResponse(
             userId= 1,
             name = nickname,
@@ -292,8 +292,8 @@ async def read_root(
         session_id = secrets.token_hex(32)
         r.set(session_id, json.dumps({"email": user_data.email}))
         r.expire(session_id, 13600)
-        response.set_cookie(key="session_id", value=session_id, httponly=True,samesite="lax",
-        secure=True , max_age=13600, domain="sjdz3b63yq-du.a.run.app")
+        response.set_cookie(key="session_id", value=session_id, httponly=True,samesite="none",
+        secure=True , max_age=13600)
         return  schemas.UserResponse(
             userId=user.id,
             name=user.name,
