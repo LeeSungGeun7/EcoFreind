@@ -6,6 +6,7 @@ import MyPageBtn from "../Components/MyPageBtn";
 import { useEffect } from "react";
 import { useAuth } from "../context/AuthContextProvider";
 import { authApi } from "../api/auth";
+import { useLayoutEffect } from "react";
 
 const center = `
 display:flex;
@@ -103,32 +104,18 @@ const Header = (props) => {
 // 로그아웃시 서버에서 세션제거
 
 
+
 const isExist = async () => {
-    const session_ = localStorage.getItem('session_id');
-    if (!session_) return
-    const parsedData = JSON.parse(session_);
-    const session = parsedData.session_id;
-    console.log(session)
-    if (session_ && session && session !== undefined) {
-      try {
-        const res = await authApi.isExist(session);
-        if (res.data === true) {
-          setUserData({...userdata,islogin:true})  
-        } else {
-            localStorage.removeItem('session_id')
-            setUserData({...userdata,islogin:false})  
-        }
-      } catch (error) {
-        console.error("오류 발생:", error);
-      }
+    const res = await  authApi.isExist();
+    if (res.data === true) {
+        setUserData({...userdata,islogin:true})
     } else {
-      alert("세션 정보가 없음");
+        setUserData({...userdata,islogin:false})
     }
-  };
+}
 
 
-useEffect(()=>{
-
+useLayoutEffect(()=>{
     isExist();
 },[])    
 

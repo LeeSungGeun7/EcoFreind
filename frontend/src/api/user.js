@@ -1,7 +1,7 @@
 import axios from "axios";
 import { EF_DOMAIN, getSessionId } from './utils';
 
-
+axios.defaults.withCredentials = true
 
 export const userApi = {
 // 회원조회

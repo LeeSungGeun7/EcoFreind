@@ -1,4 +1,4 @@
-from fastapi import Request,Response ,FastAPI ,WebSocket, WebSocketDisconnect, Depends , File , UploadFile
+from fastapi import Request,Response ,FastAPI ,WebSocket, WebSocketDisconnect, Depends , File , UploadFile , HTTPException , Cookie
 from sqlalchemy.orm import Session
 from app import crud , models , schemas
 from app.db_connection import SessionLocal , engine
@@ -73,14 +73,15 @@ origins = [
     "https://deno-front-sjdz3b63yq-du.a.run.app:3000"
     "https://deno-front-sjdz3b63yq-du.a.run.app/car",
     "https://frontend-deno-sjdz3b63yq-uc.a.run.app:3000/car",
-    "http://localhost",
     "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://localhost:3000/login",
     "http://localhost:3000/car"
 ]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -128,7 +129,7 @@ def generate_unique_code():
 
 
 @app.post('/callback/kakao')
-async def token(request: Request , db : Session = Depends(get_db_session)):
+async def token(response : Response,request: Request , db : Session = Depends(get_db_session)):
     data = await request.json()
     code = data.get('code')
     async with aiohttp.ClientSession() as session:
@@ -154,6 +155,8 @@ async def token(request: Request , db : Session = Depends(get_db_session)):
         session_id = secrets.token_hex(32)
         r.set(session_id, json.dumps(user_datas) )
         r.expire(session_id, 13600)
+        response.set_cookie(key="session_id", value=session_id, httponly=True,samesite="lax",
+        secure=True , max_age=13600)
         return schemas.UserResponse(
             userId= 1,
             name = nickname,
@@ -163,6 +166,13 @@ async def token(request: Request , db : Session = Depends(get_db_session)):
         )
         return email , nickname , access_token
 
+
+
+
+
+
+
+  
 
 @app.get('/get/message' )
 async def get_message( ct_id , db: Session = Depends(get_db_session)):
@@ -190,17 +200,17 @@ async def sign_up( body : schemas.SignUpRequsest , db: Session = Depends(get_db_
     return False    
 
 
-@app.post('/userdata' ,response_model= schemas.User)
-async def get_user(request:Request ,db: Session = Depends(get_db_session)):
-    data = await request.json()
-    session_id = data.get('session_id')
+
+@app.post('/userdata', response_model=schemas.User)
+async def get_user(session_id: str = Cookie(None), db: Session = Depends(get_db_session)):
+    if not session_id:
+        raise HTTPException(status_code=401, detail="Not authenticated")
     email = r.get(session_id)
+    if not email:
+        raise HTTPException(status_code=401, detail="Invalid session")
     s = email.decode('utf-8')
-    
     e = json.loads(s)['email']
-    
-    res = crud.get_userdata(e,db)
-    
+    res = crud.get_userdata(e, db)
     return res
 
 
@@ -254,22 +264,12 @@ async def send_email(body: schemas.Email):
 
 
 @app.post("/session", response_model=bool)
-async def get_sessions(request: Request, response: Response):
-    data = await request.json()
-    
-    session_id = data.get('session_id')
+async def get_sessions(session_id: str = Cookie(None)):
     print(session_id)
     if session_id:
-        # Redis 연결 및 초기화 코드 추가 필요
         exist = r.get(session_id)
-        print(exist)
-        if exist is None:
-            return False
-        else:
-            return True
-    else:
-        return False   
-
+        return exist is not None
+    return False
 
 
 @app.post("/emailcheck" , response_model= bool)
@@ -281,33 +281,29 @@ async def email_check(request:Request,db: Session = Depends(get_db_session)):
 
 
 
-@app.post("/login" , response_model=schemas.UserResponse)
+@app.post("/login")
 async def read_root(
-    response: Response , 
-    request: Request,
+    response: Response,
     user_data: schemas.UserCreateRequest,
-    db: Session = Depends(get_db_session) 
-    ):
-
-    user = crud.get_user(db,user_data.email,user_data.password)
-
+    db: Session = Depends(get_db_session)
+):
+    user = crud.get_user(db, user_data.email, user_data.password)
     if user:
         session_id = secrets.token_hex(32)
-        get_session(request, response, session_id,user_data)
-
-        return schemas.UserResponse(
-            userId = user.id ,
-            name = user.name,
+        r.set(session_id, json.dumps({"email": user_data.email}))
+        r.expire(session_id, 13600)
+        response.set_cookie(key="session_id", value=session_id, httponly=True,samesite="lax",
+        secure=True , max_age=13600)
+        return  schemas.UserResponse(
+            userId=user.id,
+            name=user.name,
             email=user_data.email,
             session_id=session_id,
             user="로그인 작업"
-        )
+        ) 
     else:
-        return {
-            "email" : "이메일@입력요망.com",
-            "session_id" : "세션 생성 실패"
-        }
-        
+        raise HTTPException(status_code=401, detail="Invalid credentials")  
+
 
 @app.post('/user/password' , response_model= bool)
 async def isRight_password(request:Request , db : Session = Depends(get_db_session)):
@@ -327,16 +323,14 @@ async def isRight_password(request:Request , db : Session = Depends(get_db_sessi
 
 
 
-@app.post("/logout")
-async def logout(request:Request , response:Response):
-    session_id = request.cookies.get("session_id")
-    if session_id:
-        r.expire(session_id , 0)
-        response.delete_cookie("session_id")
-        return True
-    else:
-        return False
 
+@app.post("/logout")
+async def logout(response: Response, session_id: str = Cookie(None)):
+    if session_id:
+        r.delete(session_id)
+        response.delete_cookie(key="session_id")
+        return True
+    return False
 
 
 
@@ -353,26 +347,25 @@ async def searchStation(search_request:schemas.searchRequest ,db: Session = Depe
     return stations
 
 
-@app.post('/getfav' )
-async def getFav(request:Request, db: Session = Depends(get_db_session)):
-    data = await request.json()
-    session_id = data.get('session_id')
-    email = r.get(session_id)
-    if email :
-        p = json.loads(email)
 
-        if p :
-            favStations = crud.get_FavStation(p["email"],db)
-            print(favStations)
+@app.post('/getfav')
+async def getFav(session_id: str = Cookie(None), db: Session = Depends(get_db_session)):
+    if not session_id:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    email = r.get(session_id)
+    if email:
+        p = json.loads(email)
+        if p:
+            favStations = crud.get_FavStation(p["email"], db)
             return favStations
     return []
 
 
 
 @app.post('/wishstation')
-async def get_wishstation(request:Request, db: Session = Depends(get_db_session)):
-    data = await request.json()
-    session_id = data.get('session_id')
+async def get_wishstation(session_id: str = Cookie(None), db: Session = Depends(get_db_session)):
+    if not session_id:
+        raise HTTPException(status_code=401, detail="Not authenticated")
     email = r.get(session_id)
     if email :
         p = json.loads(email)
@@ -385,11 +378,10 @@ async def get_wishstation(request:Request, db: Session = Depends(get_db_session)
 
 
 @app.post('/addfav', response_model=bool)
-async def addFav(request:Request,db: Session = Depends(get_db_session)):
-    
-    data = await request.json()
-    session_id = data.get('session_id')
+async def addFav(request:Request,session_id: str = Cookie(None),db: Session = Depends(get_db_session)):
 
+    if not session_id:
+        raise HTTPException(status_code=401, detail="Not authenticated")
     email = r.get(session_id)
     if email is None:
         return False
@@ -398,9 +390,9 @@ async def addFav(request:Request,db: Session = Depends(get_db_session)):
     try:
         data = await request.json()
         item_id = data.get('itemId')
+        print(item_id)
         if item_id is None:
             return False
-
         res = crud.add_FavStation(item_id, p["email"], db)
         return res
     except Exception as e:
@@ -409,16 +401,18 @@ async def addFav(request:Request,db: Session = Depends(get_db_session)):
         return False
 
 @app.delete('/delfav', response_model=bool)
-async def delFav(request:Request,db: Session = Depends(get_db_session)):
-    data = await request.json()
-    session_id = data.get('session_id')
+async def delFav(request:Request,session_id: str = Cookie(None),db: Session = Depends(get_db_session)):
+    if not session_id:
+        raise HTTPException(status_code=401, detail="Not authenticated")
     email = r.get(session_id)
+    
     if email is None:
         return False
     p = json.loads(email)   
     try:
         data = await request.json()
         item_id = data.get('itemId')
+        print(item_id)
         if item_id is None:
             return False
 

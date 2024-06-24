@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { EF_DOMAIN } from './utils';
 
-
+axios.defaults.withCredentials = true
 
 export const chatApi =  {
 

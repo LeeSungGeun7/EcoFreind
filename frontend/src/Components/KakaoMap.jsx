@@ -34,7 +34,7 @@ function KakaoMap({loc ,chargerInfo , Lat , Lng }) {
           map : map.current
         }));
         
-        const imageSrc = "https://imagedelivery.net/6i45l_k8v6cNrhGva7A6BA/8663bbeb-2e5b-4c7d-442e-59d66937c000/avatar";
+        const imageSrc = "https://img.icons8.com/?size=100&id=TKAoWn72gp06&format=png&color=000000";
 
 
         positions.forEach((position, index) => {

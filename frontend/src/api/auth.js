@@ -3,7 +3,7 @@ import axios from 'axios';
 import { EF_DOMAIN } from './utils';
 
 
-
+axios.defaults.withCredentials = true
 
 export const authApi =  {
     signUP: async (request) => {
@@ -23,18 +23,12 @@ export const authApi =  {
             email : id, 
             password : pw
         };
-        return await axios.post(EF_DOMAIN + "/login" , requset);  
+        return await axios.post(EF_DOMAIN + "/login" , requset, 
+        );  
     },
       // 로그아웃
       logout : async() => {
-        const session_id = localStorage.getItem('session_id');
-        const headers = {
-            headers: {
-                Cookie: `session_id=${session_id};`
-            },
-            withCredentials: true
-        };
-        return await axios.post(EF_DOMAIN + `/logout`,headers);
+        return await axios.post(EF_DOMAIN + `/logout`);
     },
 
 
@@ -69,6 +63,7 @@ export const authApi =  {
         const response = await axios.post(EF_DOMAIN + "/session", {
             session_id : session
         });
+        console.log(JSON.stringify(response))
         return response;
     },
 
