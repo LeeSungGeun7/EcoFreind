@@ -13,7 +13,15 @@ function redirection() {
     useEffect(()=>{
     const code = new URL(window.location.toString()).searchParams.get('code');
     if (code) {
-      axios.post(`${EF_DOMAIN}/callback/kakao`, { code }, { headers: { withCredentials: true } })
+      axios.post(`${EF_DOMAIN}/callback/kakao`, 
+  { code: code },
+  { 
+    withCredentials: true,
+    headers: {
+      'Content-Type': 'application/json',
+    }
+  }
+)
     .then((result)=>{
         setUserData({...userdata , islogin:true , email:result.data[0]})
         navi('/');

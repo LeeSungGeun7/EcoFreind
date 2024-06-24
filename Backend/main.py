@@ -77,7 +77,9 @@ origins = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
     "http://localhost:3000/login",
-    "http://localhost:3000/car"
+    "http://localhost:3000/car",
+    "https://kauth.kakao.com/",
+    "https://kapi.kakao.com/v2/user/me"
 ]
 
 app.add_middleware(
