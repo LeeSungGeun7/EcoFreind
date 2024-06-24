@@ -156,7 +156,7 @@ async def token(response : Response,request: Request , db : Session = Depends(ge
         r.set(session_id, json.dumps(user_datas) )
         r.expire(session_id, 13600)
         response.set_cookie(key="session_id", value=session_id, httponly=True,samesite="lax",
-        secure=True , max_age=13600)
+        secure=True , max_age=13600 , domain=".a.run.app")
         return schemas.UserResponse(
             userId= 1,
             name = nickname,
@@ -293,7 +293,7 @@ async def read_root(
         r.set(session_id, json.dumps({"email": user_data.email}))
         r.expire(session_id, 13600)
         response.set_cookie(key="session_id", value=session_id, httponly=True,samesite="lax",
-        secure=True , max_age=13600)
+        secure=True , max_age=13600, domain=".a.run.app")
         return  schemas.UserResponse(
             userId=user.id,
             name=user.name,
