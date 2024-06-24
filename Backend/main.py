@@ -132,7 +132,7 @@ def generate_unique_code():
 
 
 @app.post('/callback/kakao')
-async def token(response : Response,request: Request , db : Session = Depends(get_db_session)):
+async def token(responses : Response,request: Request , db : Session = Depends(get_db_session)):
     data = await request.json()
     code = data.get('code')
     async with aiohttp.ClientSession() as session:
@@ -158,7 +158,7 @@ async def token(response : Response,request: Request , db : Session = Depends(ge
         session_id = secrets.token_hex(32)
         r.set(session_id, json.dumps(user_datas) )
         r.expire(session_id, 13600)
-        response.set_cookie(key="session_id", value=session_id, httponly=True,samesite="none",
+        responses.set_cookie(key="session_id", value=session_id, httponly=True,samesite="none",
         secure=True , max_age=13600 )
         return schemas.UserResponse(
             userId= 1,
