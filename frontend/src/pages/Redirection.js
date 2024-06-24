@@ -5,7 +5,7 @@ import { EF_DOMAIN } from '../api/utils';
 import { useAuth } from '../context/AuthContextProvider';
 
 
-
+axios.defaults.withCredentials = true
 
 function redirection() {
     const {userdata , setUserData} = useAuth()  
