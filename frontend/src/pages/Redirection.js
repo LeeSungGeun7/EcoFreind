@@ -13,12 +13,8 @@ function redirection() {
     useEffect(()=>{
     const code = new URL(window.location.toString()).searchParams.get('code');
     if (code) {
-    axios.post(`${EF_DOMAIN}/callback/kakao`,{
-        code : code
-    })
+      axios.post(`${EF_DOMAIN}/callback/kakao`, { code }, { headers: { withCredentials: true } })
     .then((result)=>{
-        console.log(localStorage.getItem('session_id'))
-        localStorage.setItem('session_id', JSON.stringify(result.data))
         setUserData({...userdata , islogin:true , email:result.data[0]})
         navi('/');
     })
