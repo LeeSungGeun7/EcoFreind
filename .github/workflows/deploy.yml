@@ -60,3 +60,5 @@ jobs:
             --region=${{ secrets.PROJECT_REGION }} \
             --platform=managed \
             --allow-unauthenticated
+
+           

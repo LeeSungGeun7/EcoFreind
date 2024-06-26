@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import styled from 'styled-components';
-import markerimg from '../images/marker.png'
+
 
 
 
@@ -36,6 +36,7 @@ function KakaoMap({loc ,chargerInfo , Lat , Lng }) {
         
         const imageSrc = "https://img.icons8.com/?size=100&id=TKAoWn72gp06&format=png&color=000000";
 
+        const markerimg = '/marker.png'
 
         positions.forEach((position, index) => {
           const imageSize = new window.kakao.maps.Size(30, 30);

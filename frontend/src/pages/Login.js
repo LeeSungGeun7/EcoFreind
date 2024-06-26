@@ -8,6 +8,8 @@ import { useAuth } from '../context/AuthContextProvider';
 import { authApi } from '../api/auth';
 
 
+
+//https://imagedelivery.net/6i45l_k8v6cNrhGva7A6BA/e695240c-9c41-4098-9724-4b741c70ca00/avatar
     
 const Container = styled.div`
 
@@ -82,7 +84,7 @@ const Container = styled.div`
     width: 15%;
     height:10%;
     cursor: pointer;
-    
+
   }
   .title {
     font-size: 20px;
@@ -162,7 +164,7 @@ const Login = () => {
           <button className='login-btn' onClick={onClickLogin}>Login</button>
           
           <Link className='kakao' to={`https://kauth.kakao.com/oauth/authorize?client_id=${process.env.REACT_APP_KAKAO_REST_API_KEY}&redirect_uri=${process.env.REACT_APP_KAKAO_REDIRECT_URI}&response_type=code`}>
-            <img src="https://imagedelivery.net/6i45l_k8v6cNrhGva7A6BA/e695240c-9c41-4098-9724-4b741c70ca00/avatar" alt="" />
+            <img src={'/kakaoLogin.webp'} alt="" />
           </Link>  
 
         </div>
@@ -171,6 +173,6 @@ const Login = () => {
     </Container>
     </>
   );
-            };
+          };
 
 export default Login;

@@ -230,6 +230,7 @@ useEffect(()=>{
 },[])
 
 
+
 const handleInput = debounce((e) => {
   setType({...type , city: e.target.value , station_name: e.target.value});
 },200)
@@ -254,8 +255,8 @@ const [loc , setLoc] = useState({
 
 
 // 데이터 페칭 
-const handleSearch = useCallback( async (isMore = false) => {
-  alert(JSON.stringify(loc))
+const handleSearch = useCallback( async (isMore = false ) => {
+  console.log(JSON.stringify(loc))
   if (!isMore) setSkip(0);
   const res = await chargerApi.searchData(
     type.station_name,
@@ -276,26 +277,29 @@ const handleSearch = useCallback( async (isMore = false) => {
       setChargeData(res.data);
     }
   }
-},[type.station_name, type.city, type.charger_method, type.charger_type, skip, loc]
+},[type.station_name, type.city, type.charger_method, type.charger_type, skip, loc.meter]
 );
 
-const moreData = async () => {
+const moreData =() => {
   setSkip(prevSkip => prevSkip + 1);
   handleSearch(true);
 };
 
+useEffect(()=>{
+  console.log(loc.meter)
+},[loc.meter])
 
 
 // 무한 스크롤 하단감지
 const target = useRef(null);
 
-const intersectionCallback = (entries, observer) => {
+const intersectionCallback = useCallback((entries, observer) => {
     entries.forEach((entry) => {
       if (entry.isIntersecting) {
      moreData();
       }
     });
-};
+},[moreData]);
 
 useIntersectionObserver(target, intersectionCallback);
 
