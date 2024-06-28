@@ -11,7 +11,7 @@ const Layout = lazy(()=>(import('./layout/Layout')));
 const ServiceCenter = lazy(()=>(import('./pages/ServiceCenter')));
 const Payment = lazy(()=>(import('./pages/Payment')));
 const Redirection = lazy(()=>(import('./pages/Redirection')));
-
+const Temp = lazy(()=>(import('./pages/Test')));
 
 function App() {
  
@@ -32,8 +32,8 @@ function App() {
         <Route path="/Mypage" element={userdata.islogin ? <MyPage /> : <Login/>} />
         <Route path="/Service/:id/:name" element={userdata.islogin ? <ServiceCenter/> : <Login/> } />
 
-
-        <Route path="/pay" element={<Payment />} />
+  
+        <Route path="/pay" element={<Temp/>} />
 
       </Routes>
       </Suspense>

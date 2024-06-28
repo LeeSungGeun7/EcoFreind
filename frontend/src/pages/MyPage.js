@@ -22,7 +22,7 @@ const Container = styled.div`
     font-size: 1.5rem;
     ${center}
     flex-direction:column;
-    background-color: #DCDCDC;
+    background-color: ivory;
     
     //height: 100vh;
     min-height: auto;
@@ -94,7 +94,7 @@ const Main = styled.div`
     ${center}
     width: 100%;
     height: 70%;
-    background-color: #DCDCDC;
+    background-color: white;
 
 
     @media (min-width: 1000px) {
@@ -255,11 +255,7 @@ const ImgForm = ({avatar}) => {
             } else {
                 alert('프로필 사진 변경 실패하였습니다.')
             }
-    }
-        // const form = new FormData()
-        // form.append(file)
-        
-        
+    }   
     }
 
     
