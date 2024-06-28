@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { Suspense, useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import Header from "../layout/Header";
 import Footer from "../layout/Footer";
@@ -8,6 +8,8 @@ import { z } from 'zod';
 import { chargerApi } from "../api/charger";
 import { userApi } from "../api/user";
 import { BsPencilSquare } from "react-icons/bs";
+import SkeletonLoader, { SkeletonRow } from "../Components/SkeletonLoader";
+import LoadingSquare from "../Components/LoadingSquare";
 
 const center = `
 display: flex;
@@ -22,11 +24,16 @@ const Container = styled.div`
     font-size: 1.5rem;
     ${center}
     flex-direction:column;
-    background-color: ivory;
-    
+    background-color: #f6f6f6;
+
     //height: 100vh;
     min-height: auto;
     width: 100vw;
+
+    .loading {
+        height: 80vh;
+        width: 100vw;
+    }
 `;
 
 
@@ -80,7 +87,7 @@ const SideBar = styled.div`
         div {
             /* border-top-left-radius: 10px;
             border-top-right-radius: 10px; */
-            background-color:black;
+            background-color: #0AD1F8;
             color: white;
             width: 34%;
             height: 50px;
@@ -120,7 +127,7 @@ const Main = styled.div`
         }
         button {
             border : none ; 
-            background-color: skyblue;
+            background-color:  skyblue;
             border-radius: 10px;
             width: 40px;
             height: 30px;
@@ -262,7 +269,9 @@ const ImgForm = ({avatar}) => {
     return (
         <>
         <form className="avatar_group">
+            <Suspense fallback={<SkeletonLoader/>}>
             <img onClick={(e)=>{handleSelectIamge(e)}} src={selectedImage} alt=""/>
+            </Suspense>
             <input accept="image/*"  onChange={handleChangeImage} ref={imgRef} hidden type="file" name="" id="" />
             <BsPencilSquare className="modify"></BsPencilSquare>
         </form>
@@ -295,6 +304,7 @@ const Mypage = () => {
     const [menu , setMenu] = useState(2)
     const [userdata,setUserData] = useState({})
     const [favdata,setFavData] = useState([])
+    const [loading , setLoading] = useState(false)
 
     const fetchData = async () => {
         const res = await userApi.getCustomerInfo()
@@ -311,8 +321,21 @@ const Mypage = () => {
     } 
 
     useEffect(()=>{
-        fetchData();
-        fetchFav();
+        // fetchData();
+        // fetchFav();
+        const loadData = async () => {
+            setLoading(true);
+            try {
+              await Promise.all([fetchData(), fetchFav()]);
+            } catch (error) {
+              console.error("Error loading data:", error);
+              // 에러 처리 로직 추가
+            } finally {
+              setLoading(false);
+            }
+          };
+        
+          loadData();
     },[])
 
     const [hidden, setHidden] = useState(false) ; 
@@ -323,7 +346,12 @@ const Mypage = () => {
         <Header overlap={false}/>
         <Container>
             <Avatar>
-                {userdata && <ImgForm avatar={userdata.avatar}/>}
+                {loading ? 
+                <LoadingSquare/>
+                :
+                <ImgForm avatar={userdata.avatar}/>
+                }
+                
             </Avatar>
             <SideBar>
                 {/* <div className="logo">MY</div> */}
@@ -347,15 +375,19 @@ const Mypage = () => {
                     }
                     {
                         menu === 2 && 
+                        
                         <MyInfo >
+
                             {
+                                 loading ? <SkeletonRow className="loading"/>:
+
                                 favdata.map((item,idx)=>{
                                     if (idx === favdata.length - 1 && !item.station_name) {
                                         return null; 
                                       }
                                     return(
                                         <>
-                                        <MyInfoItem on={true} favdata={favdata} setFavData={setFavData} data={item}  keys={item.id} name={<FaStar onClick={()=>{handelFav(item.id)}} style={{color: "skyblue" }}/>} content={item.station_name}/>
+                                        <MyInfoItem on={true} favdata={favdata} setFavData={setFavData} data={item}  keys={item.id} name={<FaStar onClick={()=>{handelFav(item.id)}} style={{color: "#FCE205" }}/>} content={item.station_name}/>
                                             {
                                             item.isClick &&
                                             <Infodetail>
