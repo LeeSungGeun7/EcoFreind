@@ -70,6 +70,7 @@ class User(BaseModel):
     addr :  str
     created_at : datetime
     favorite_station_ids : Optional[Set[int]] = None
+    avatar : str
     
     class Config:
         orm_mode = True

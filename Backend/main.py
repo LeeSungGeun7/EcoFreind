@@ -1,4 +1,4 @@
-from fastapi import Request,Response ,FastAPI ,WebSocket, WebSocketDisconnect, Depends , File , UploadFile , HTTPException , Cookie
+from fastapi import Request,Response,UploadFile, File ,FastAPI ,WebSocket, WebSocketDisconnect, Depends , File , UploadFile , HTTPException , Cookie
 from sqlalchemy.orm import Session
 from app import crud , models , schemas
 from app.db_connection import SessionLocal , engine
@@ -14,6 +14,7 @@ from email.mime.text import MIMEText
 import random
 import aiohttp
 import asyncio
+from fastapi.responses import JSONResponse
 
 
 
@@ -131,6 +132,67 @@ def generate_unique_code():
     return code
 
 
+
+
+
+
+
+
+
+
+
+
+@app.post('/upload/image')
+async def imageUpload(file: UploadFile = File(...), session_id: str = Cookie(None) , db : Session = Depends(get_db_session)):
+    if not session_id:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    p = json.loads( r.get(session_id))    
+    email = p['email']
+    async with aiohttp.ClientSession() as session:
+        headers = {
+            "Authorization": "Bearer nfntPQjvXgLIpCGnAXlo_tnRY8qcneW9LQbURz-G"
+        }
+        
+        async with session.post(
+            "https://api.cloudflare.com/client/v4/accounts/3aded0ba5c2b936fdeb7d51367ab8078/images/v2/direct_upload",
+            headers=headers
+        ) as response:
+            response_data = await response.json()
+            if response.status == 200:
+                result = response_data.get('result', {})
+                id = result.get('id')
+                uploadURL = result.get('uploadURL')
+                print(id, uploadURL)
+                
+                if id and uploadURL:
+                    file_content = await file.read()
+                    form_data = aiohttp.FormData()
+                    form_data.add_field('file', file_content, filename=file.filename, content_type=file.content_type)
+                    
+                    async with session.post(uploadURL, data=form_data) as upload_response:
+                        upload_response_data = await upload_response.json()
+                        if upload_response.status == 200:
+                            result = upload_response_data.get('result', {})
+                            image =  result.get('variants')[1]
+                            
+                            if image :
+                                print(image)
+                                crud.change_avatar(db, email ,image)
+                                return True
+                            else :
+                                return False
+            
+            return JSONResponse(
+                status_code=response.status,
+                content={"error": "Failed to get upload URL", "details": response_data}
+            )
+
+           
+
+
+
+
+
 @app.post('/callback/kakao')
 async def token(responses : Response,request: Request , db : Session = Depends(get_db_session)):
     data = await request.json()
@@ -215,6 +277,9 @@ async def get_user(session_id: str = Cookie(None), db: Session = Depends(get_db_
     e = json.loads(s)['email']
     res = crud.get_userdata(e, db)
     return res
+
+
+
 
 
 

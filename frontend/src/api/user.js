@@ -21,4 +21,19 @@ isRightPassword: async(password) => {
     );
 },
 
+getcloudImageURL: async (form) => {
+    try {
+        const response = await axios.post(`${EF_DOMAIN}/upload/image`,
+        form,  // FormData 객체를 직접 전달합니다.
+            {
+                headers: {
+                    'Content-Type': 'multipart/form-data'  // 중요: 이 헤더를 설정해야 합니다.
+                }
+            })
+        return response.data;
+    } catch (error) {
+        console.error('Error getting Cloudflare upload URL:', error);
+        throw error;
+    }
+}
 }

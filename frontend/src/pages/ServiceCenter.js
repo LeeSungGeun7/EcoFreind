@@ -159,19 +159,14 @@ const ServiceCenter = () => {
     useEffect(() => {
         getChatMessage();
         getUserData();
-
         const socket = new WebSocket(`wss://backend-deno-sjdz3b63yq-du.a.run.app/ws/${id}`);
-        
         socket.onopen = () => {
-          console.log('WebSocket connected');
           setConnected(true);
         };
-    
         socket.onmessage = (event) => {
           const message = event.data;
           const r = message.split(',')
-          setMessages(prev => [...prev, {message : r[1] , user : {name : r[2] },created_at : new Date() }  ]);
-        
+          setMessages(prev => [...prev, {message : r[1] , user : {name : r[2] },created_at : new Date() }  ]);   
         };
         
         socket.onerror = (error) => {
@@ -182,9 +177,7 @@ const ServiceCenter = () => {
           console.log('WebSocket disconnected');
           setConnected(false);
         };
-        
         ws.current = socket;
-    
         return () => {
           socket.close();
         };
@@ -201,8 +194,8 @@ const ServiceCenter = () => {
     }; 
     
 
-    const sendTemp = (type) => {
-        setInputText(type === 1 ? '이용 가능해요' : '이용이 안되요')
+    const SendClickMessage = (type) => {
+        setInputText(type)
         if (inputText && ws.current.readyState === WebSocket.OPEN) {
             const messageData = `${currentUser.id}|${inputText}|${currentUser.name}`;
             ws.current.send(messageData);
@@ -219,14 +212,21 @@ const ServiceCenter = () => {
         }
     },[])
 
-// id , message , user , created_at
+
+    const chatRef = useRef(null);
+    const ScrollControl = () => {
+        if (chatRef.current) {
+        chatRef.current.scrollIntoView({ behavior: 'smooth' })
+        }
+    }
+    
     return(
         <>
         <Header/>
             <Container>
                 <IoMdArrowRoundBack className="back-btn" onClick={()=>{navigate(-1)}}>{'<'}</IoMdArrowRoundBack>
                 <div className="title">{name}</div>
-                <div className="body"> 
+                <div className="body" ref={chatRef}> 
                 {
                     messages.map((item,idx)=>{
                         return(
@@ -236,7 +236,6 @@ const ServiceCenter = () => {
                                     <div className="user-name">{item.user.name ? item.user.name : item}</div>
                                     <div className="time">{elapsedTime(item.created_at)}</div>  
                                 </div>
-
                             </Message>
                         )
                     })
@@ -249,11 +248,11 @@ const ServiceCenter = () => {
                 <div className="user">
                     <div>
                         <BsEmojiSunglasses/>
-                        <button onClick={()=>{sendTemp(1)}}>이용 가능해요</button>
+                        <button onClick={()=>{SendClickMessage('이용 가능해요')}}>이용 가능해요</button>
                     </div>
                     <div>
                         <HiOutlineEmojiSad/>
-                        <button onClick={()=>{sendTemp(2)}}>이용이 안되요</button>
+                        <button onClick={()=>{SendClickMessage('이용이 안되요')}}>이용이 안되요</button>
                     </div>
                 </div>
             </Container>

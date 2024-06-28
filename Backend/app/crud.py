@@ -245,3 +245,16 @@ def get_user(db:Session ,email:str , password:str):
         and models.User.password == password
     ).first()
     return user  
+
+
+def change_avatar(db:Session ,email:str , image : str ):
+    user = db.query(models.User).filter(
+        models.User.email == email
+    ).first()
+    if user is None :
+        return None
+    user.avatar = image 
+    db.commit()
+    db.refresh(user)
+
+

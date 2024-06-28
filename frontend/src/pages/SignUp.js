@@ -231,10 +231,8 @@ const SignUp = () => {
 
 	const handleSubmit =async (e) => {
 	  e.preventDefault();
-	  console.log(formData);
 	  try {
 		SignUpSchema.parse(formData);
-		
 		const res = await authApi.signUP(formData)
 		if (res.status === 200){
 			if (res.data) {
@@ -242,7 +240,6 @@ const SignUp = () => {
 				navigate('/login')
 			}
 		}
-
 	  } catch (error) {
 		const formattedErrors = {};
 		error.errors.forEach(e => {
@@ -254,11 +251,6 @@ const SignUp = () => {
 
 
 
-	// 인증하기
-	const onChangeKey = (e) => {
-		setKeyCode(e.target.value);
-	}
-
 	const onClickGetKey = async () => {
 		const res = await authApi.codesend(formData.email);
 		if(res.status === 200) {
@@ -267,18 +259,30 @@ const SignUp = () => {
 		} 
 	}
 
+	const handleonChange = (e, set , setVal , property) => {
+		set({...setVal , property : e.target.value })
+	}
+
+	const onChangeKey = (e) => {
+		setKeyCode(e.target.value);
+	}
+
+	const onChangeAddress = (e) => {
+		setFormData({...formData,address:e.target.value});
+	}
+
 	const onChangePwd = (e) => {
 		setFormData({...formData,password: e.target.value});
 	}
+
+
 
 	const onChangePhone = e => {
 		e.target.value = e.target.value.replace(/[^0-9]/g, '').replace(/^(\d{2,3})(\d{3,4})(\d{4})$/, `$1-$2-$3`);
 		setFormData({...formData,phone:e.target.value});
 	}
 
-	const onChangeAddress = (e) => {
-		setFormData({...formData,address:e.target.value});
-	}
+	
 	const openDaumAddress = () => {
 		new window.daum.Postcode({
       oncomplete: function(data) {

@@ -10,7 +10,7 @@ import { Item } from "../pages/CarSearch"
 
 const ChargerItem = ({data , setLoc }) => {
     const navigate = useNavigate();
-  
+    const [fav , setFav] = useState(new Set([]))
     
     const getFav = async () => {
       const res = await chargerApi.getWishStations();
@@ -28,12 +28,8 @@ const ChargerItem = ({data , setLoc }) => {
   
     useEffect(()=>{
       getFav()
-      
-  
     },[])
   
-  
-    const [fav , setFav] = useState(new Set([]))
     
     const handelFav = async (id) => {
       if (!fav.has(id)) {
@@ -59,14 +55,15 @@ const ChargerItem = ({data , setLoc }) => {
           <Item id={`chargeItem-${item.id}`}  key={idx}>
             <FaStar onClick={()=>{handelFav(item.id)}} style={{color: fav.has(item.id) ? "yellow" : "silver" }}/>
             <div onClick={()=>{setLoc({latitude:item.latitude , longitude:item.longitude})}} className="title">
-              <div>{item.station_name}</div>
-              <div style={{fontSize:"11px"}}>{item.charger_type + "+" + item.charger_type_major}</div>
+                <div>{item.station_name}</div>
+                <div style={{fontSize:"11px"}}>{item.charger_type + "+" + item.charger_type_major}</div>
             </div>
             <TbMessageChatbot onClick={()=>{handleRoute(item.id, item.station_name ? item.station_name : "이름없음")}}  style={{fontSize:"20px"}} />
             {
-              item.user_restriction ==="이용가능" ? 
-            <TbMoodHappy style={{backgroundColor:"",color:"skyblue"}}/> :
-              <TbMoodCry/>
+                item.user_restriction ==="이용가능" ? 
+                <TbMoodHappy style={{backgroundColor:"",color:"skyblue"}}/> 
+                :
+                <TbMoodCry/>
             }
           </Item>
         ))}

@@ -33,18 +33,14 @@ const MyPageBtnst = styled.div`
 
 const MyPageBtn = (props) => {
     const navigate = useNavigate();
-
     const navHandle = () => {
         navigate("/myPage");
     }
     return(
        <MyPageBtnst>
-       <div onClick={navHandle} className="person">
-        
+       <div onClick={navHandle} className="person">   
         <MdPerson>
         </MdPerson>
-        
-        
        </div>
        </MyPageBtnst>  
     );

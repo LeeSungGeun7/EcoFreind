@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import Header from "../layout/Header";
 import Footer from "../layout/Footer";
@@ -7,6 +7,7 @@ import { FaCaretDown ,FaCaretUp} from "react-icons/fa";
 import { z } from 'zod';
 import { chargerApi } from "../api/charger";
 import { userApi } from "../api/user";
+import { BsPencilSquare } from "react-icons/bs";
 
 const center = `
 display: flex;
@@ -22,10 +23,34 @@ const Container = styled.div`
     ${center}
     flex-direction:column;
     background-color: #DCDCDC;
-    min-height: 100vh;
-    height: auto;
+    
+    //height: 100vh;
+    min-height: auto;
     width: 100vw;
 `;
+
+
+const Avatar = styled.div`
+    ${center}
+    width : 100%;
+    height: 100px;
+    margin: 30px;
+    img {
+        width: 100px;
+        height: 100px;
+        border-radius: 50px;
+    }
+    .avatar_group {
+        position: relative;
+    }
+    .modify {
+        font-size: 1rem;
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+    }
+`
+
 
 const SideBar = styled.div`
     ${center} 
@@ -200,6 +225,55 @@ const MyInfoItem = ({on ,keys, favdata , setFavData , name , content , data}) =>
 }
 
 
+const ImgForm = ({avatar}) => {
+    const imgRef = useRef(null)
+    const [selectedImage , setSelectedImage] = useState(avatar ? avatar : "/avatar.jpeg");
+    
+    useEffect(()=>{
+        setSelectedImage(avatar)
+    },[avatar])
+
+    const handleSelectIamge = () => {
+        imgRef.current.click()
+    }
+
+    const handleChangeImage = async (e) => {
+        if (e.target.files && e.target.files[0]) {
+        const file = e.target.files[0]
+        const read = new FileReader();
+        read.readAsDataURL(file);
+        
+        const form = new FormData()
+        form.append('file' , file , file.name)
+
+            read.onload = () => {
+                setSelectedImage(read.result)
+            }
+            const res = await userApi.getcloudImageURL(form)
+            if (res === true) {
+                alert('프로필 사진이 변경되었습니다.')
+            } else {
+                alert('프로필 사진 변경 실패하였습니다.')
+            }
+    }
+        // const form = new FormData()
+        // form.append(file)
+        
+        
+    }
+
+    
+    return (
+        <>
+        <form className="avatar_group">
+            <img onClick={(e)=>{handleSelectIamge(e)}} src={selectedImage} alt=""/>
+            <input accept="image/*"  onChange={handleChangeImage} ref={imgRef} hidden type="file" name="" id="" />
+            <BsPencilSquare className="modify"></BsPencilSquare>
+        </form>
+        </>
+    )
+}
+
 
 
 const Mypage = () => {
@@ -230,7 +304,6 @@ const Mypage = () => {
         const res = await userApi.getCustomerInfo()
         if (res.status === 200) {
             setUserData(res.data)
-            console.log(res);
         }
     }
 
@@ -251,9 +324,11 @@ const Mypage = () => {
     return(
 
         <>
-        
         <Header overlap={false}/>
         <Container>
+            <Avatar>
+                {userdata && <ImgForm avatar={userdata.avatar}/>}
+            </Avatar>
             <SideBar>
                 {/* <div className="logo">MY</div> */}
                 <div className="menu">

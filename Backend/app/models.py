@@ -29,6 +29,7 @@ class User(Base):
 
     id = Column(Integer, primary_key=True)
 
+    avatar = Column(String , nullable=True)
     name = Column(String(10), nullable=False)
     email = Column(String(255) , nullable=False, unique=True)
     password = Column(String , nullable=False)
@@ -40,6 +41,13 @@ class User(Base):
     favorite_stations = relationship("ChargeStation", secondary="user_favorite_stations", back_populates="favorited_by")    
 
     messages = relationship("Message", back_populates="user")
+
+
+class News(Base):
+    __tablename__ = "news"
+
+    id = Column(Integer , primary_key=True)
+    
 
 
 
