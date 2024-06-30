@@ -229,8 +229,8 @@ async def token(responses : Response,request: Request , db : Session = Depends(g
             name = nickname,
             email= email,
             session_id=session_id,
-            avatar=user.avatar
-            # user="로그인 작업",
+            avatar=user.avatar,
+            user="로그인 작업",
         )
         return email , nickname , access_token
 
