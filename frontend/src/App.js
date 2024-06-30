@@ -1,5 +1,5 @@
-import React , { Suspense, lazy } from 'react'; 
-import {BrowserRouter as Router , Route , Routes} from 'react-router-dom';
+import React , { Suspense, lazy, useEffect } from 'react'; 
+import {BrowserRouter as Router , Route , Routes, useNavigate} from 'react-router-dom';
 import { useAuth } from './context/AuthContextProvider';
 
 
@@ -14,8 +14,23 @@ const Redirection = lazy(()=>(import('./pages/Redirection')));
 const Temp = lazy(()=>(import('./pages/Test')));
 
 function App() {
+
+
  
   const {userdata , setUserData} = useAuth()
+
+  const user = localStorage.getItem('userData')
+  useEffect(() => {
+    if (!user) {
+      // 로그아웃 처리
+      handleLogout();
+    }
+  }, [user]);
+
+  const handleLogout = () => {
+    setUserData({...userdata , islogin:false})
+  };
+
   return (
    <>
    <Router>

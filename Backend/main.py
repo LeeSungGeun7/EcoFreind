@@ -240,15 +240,19 @@ async def token(responses : Response,request: Request , db : Session = Depends(g
   
 
 @app.get('/get/message' )
-async def get_message( ct_id , db: Session = Depends(get_db_session)):
+async def get_message( ct_id , db: Session = Depends(get_db_session),session_id: str = Cookie(None)):
+    if not session_id:
+        raise HTTPException(status_code=401, detail="Not authenticated")
     res = crud.get_messages(ct_id , db)
-
+    print(res)
     return res 
 
 
 
 @app.post('/send/message' , response_model= bool)
-async def send_message( body : schemas.RequestSendMessage , db: Session = Depends(get_db_session)):
+async def send_message(body : schemas.RequestSendMessage , db: Session = Depends(get_db_session),session_id: str = Cookie(None)):
+    if not session_id:
+        raise HTTPException(status_code=401, detail="Not authenticated")
     res = crud.send_message(body.user_id , body.chargestation_id , body.message , db)
 
     return res 
@@ -367,6 +371,7 @@ async def read_root(
             name=user.name,
             email=user_data.email,
             session_id=session_id,
+            avatar= user.avatar,
             user="로그인 작업"
         ) 
     else:

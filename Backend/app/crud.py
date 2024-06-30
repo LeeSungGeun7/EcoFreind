@@ -72,7 +72,8 @@ def get_messages(ct_id: int, db: Session) -> Tuple[List[schemas.MessageOut]]:
             id=message.id,
             message=message.message,
             created_at=message.created_at,
-            user= message.user
+            user= message.user,
+            avatar = message.user.avatar
         )
         for message in messages
     ]

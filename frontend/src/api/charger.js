@@ -1,15 +1,16 @@
 import axios from "axios";
-import { EF_DOMAIN, getSessionId } from './utils';
+import { Axios, EF_DOMAIN, getSessionId } from './utils';
 
 axios.defaults.withCredentials = true
 
 // 훅의 동작원리 , 훅의 필요성 , 훅의 커스텀 , 태스트 
 // 
 
+
 export const chargerApi = {
 
 getWishStation :  async () => {
-    const response = await axios.post(EF_DOMAIN+ "/wishstation",
+    const response = await Axios.post(EF_DOMAIN+ "/wishstation",
     {withCredentials: true},
     );
     return response;
@@ -17,7 +18,7 @@ getWishStation :  async () => {
 
 
 getWishStations : async () => {
-    const response = await axios.post(EF_DOMAIN+ "/getfav",
+    const response = await Axios.post(EF_DOMAIN+ "/getfav",
     {}, // 빈 객체를 요청 본문으로 전송
     {
         headers: {
@@ -32,7 +33,7 @@ getWishStations : async () => {
 
 
 delwishStation: async (itemId) => {
-  const response = await axios.delete(EF_DOMAIN+ "/delfav",{
+  const response = await Axios.delete(EF_DOMAIN+ "/delfav",{
    data:{itemId : itemId}
   })
   if (response.status === 200 && response.data === true) {
@@ -43,7 +44,7 @@ delwishStation: async (itemId) => {
 },
 
 addWishStation: async (itemId) => {
-  const response = await axios.post(EF_DOMAIN+ "/addfav",{
+  const response = await Axios.post(EF_DOMAIN+ "/addfav",{
     itemId : itemId
     })
     if (response.status === 200 && response.data === true) {

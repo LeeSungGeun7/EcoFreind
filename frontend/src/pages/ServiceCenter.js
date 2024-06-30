@@ -13,7 +13,6 @@ import { userApi } from "../api/user";
 
 const center = `
     display:flex;
-    justify-content: space-evenly;
     align-items: center;
 `
 
@@ -21,26 +20,39 @@ const Message = styled.div`
     display:flex;
     ${center};
     flex-direction: ${props => props.role  ? 'row':"row-reverse"};
-    
+    justify-content: ${props => props.role  ? 'end':"start"};
     width: 100%;
-    white-space: normal;
+    white-space : normal; 
     .content {
-     background-color :  ${props => props.role  ? '#F9F871':"white"};
-     width: 80%;   
+     background-color :  ${props => props.role  ? '#00A3FF':"#EEF4FD"};
+     
+     min-width: 200px; 
+     width: auto;  
      margin : 15px;
      padding: 8px;
      ${center}
+     justify-content:center;
+     display:flex;
      flex-wrap: wrap;
      border-radius : 10px;   
      white-space : normal; 
+     word-break:break-all;
+     color : ${props => props.role  ? 'white':"black"};
+     min-height: 40px; 
      height: auto; 
-     min-height: 50px; 
     }
+    
    
+    .avatar_img {
+        border-radius: 50px;
+        width: 4rem;
+        height: 4rem;
+    }
 
     .time {
         ${center}
         margin:5px;
+        font-size:10px;
     }
 
     .user-name {
@@ -60,18 +72,23 @@ const Container = styled.div`
     height: 100vh;
     ${center}
     flex-direction: column;
-    background-color : #00D2FC;
-
+    background-color : white;
+    position:relative;
     .back-btn {
+        position: absolute;
+        top: 7%;
+        left: 10%;
+        transform: translate(-50%, -50%);
         padding:5px;
-        margin-right: auto;
+        /* left:10%;
+        top: 12%; */
         width: 50px;
         height: 50px;
     }
 
     .title {
         height: 20px;
-        color : white;
+        color : black;
         font-size: 30px;
         margin : 30px;
     }
@@ -91,8 +108,10 @@ const Container = styled.div`
         input , button  {
             border:none;
             padding:10px;
+            margin-top : 10px;
             border-radius: 15px;;
             width: 80%;
+            background-color: #E1E8F1;
         }
         button {
             margin: 10px;
@@ -136,22 +155,33 @@ const ServiceCenter = () => {
     const [currentUser , setCurrentUser] = useState({
         name : "ff" ,
         id : 0 , 
+        avatar : ''
     })
     const [messages, setMessages] = useState([]);
+
     const [inputText, setInputText] = useState('');
     const [connected, setConnected] = useState(false);
     const ws = useRef(null);
 
+    
+    const [msg , setMsg] = useState({})
     const getChatMessage = async () => {
         const res = await chatApi.getMessages(id)
         if (res.status === 200) {
             setMessages(res.data)
+            const newMsg = { ...msg };
+            res.data.forEach(e => {
+              const userId = e.user.id;
+              newMsg[userId] = e.avatar;
+            });
+            setMsg(newMsg);
+            
         }
     }
     const getUserData = async () => {
         const res = await userApi.getCustomerInfo()
         if (res.status ===200 ) {
-            setCurrentUser({...currentUser , name : res.data.name , id : res.data.id})
+            setCurrentUser({...currentUser , name : res.data.name , id : res.data.id , avatar: res.data.avatar})
             return true
         }
     }
@@ -166,7 +196,7 @@ const ServiceCenter = () => {
         socket.onmessage = (event) => {
           const message = event.data;
           const r = message.split(',')
-          setMessages(prev => [...prev, {message : r[1] , user : {name : r[2] },created_at : new Date() }  ]);   
+          setMessages(prev => [...prev, {message : r[1] , user : {name : r[2] , id : r[0]},created_at : new Date() }  ]);   
         };
         
         socket.onerror = (error) => {
@@ -189,8 +219,11 @@ const ServiceCenter = () => {
         if (inputText && ws.current.readyState === WebSocket.OPEN) {
             const messageData = `${currentUser.id}|${inputText}|${currentUser.name}`;
             ws.current.send(messageData);
+            
           setInputText('');
+          alert(JSON.stringify(messages))
         }
+        
     }; 
     
 
@@ -212,14 +245,24 @@ const ServiceCenter = () => {
         }
     },[])
 
-
     const chatRef = useRef(null);
-    const ScrollControl = () => {
+    useEffect(()=>{
+        scrollToBottom();
+    },[messages])
+    const scrollToBottom = () => {
         if (chatRef.current) {
-        chatRef.current.scrollIntoView({ behavior: 'smooth' })
+          chatRef.current.scrollTop = chatRef.current.scrollHeight;
         }
-    }
+    };
     
+    
+
+    // 채팅방 입장시 해당 채팅기록을 가져옴 user들의 프로필사진을 
+    // 객체 오브젝트에
+    // {key : userId  value : imgUrl }
+    // 이런식으로 저장하고 
+    // 메세지마다 프로필 사진 이미지 src 는 key 값의 value로 설정
+
     return(
         <>
         <Header/>
@@ -231,11 +274,21 @@ const ServiceCenter = () => {
                     messages.map((item,idx)=>{
                         return(
                             <Message role={item.user.name === currentUser.name}  key={idx}>
-                                <div className="content">{item.message}</div>
+                                <div className="content">
+                                    <div>
+                                        {item.message}
+                                    </div>
+
+                                </div>
+
                                 <div className="avatar">
+                                <img className="avatar_img" src={msg[item.user.id]}/>
+                                <div className="time">{elapsedTime(item.created_at)}</div>  
+                                </div>
+                                {/* <div className="avatar">
                                     <div className="user-name">{item.user.name ? item.user.name : item}</div>
                                     <div className="time">{elapsedTime(item.created_at)}</div>  
-                                </div>
+                                </div> */}
                             </Message>
                         )
                     })
@@ -256,7 +309,7 @@ const ServiceCenter = () => {
                     </div>
                 </div>
             </Container>
-        <Footer/>
+        {/* <Footer/> */}
         </>
     );
 }

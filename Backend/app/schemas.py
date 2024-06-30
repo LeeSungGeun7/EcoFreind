@@ -40,6 +40,8 @@ class MessageOut(BaseModel):
     message: str
     user: Optional[UserSchema]
     created_at: datetime
+    avatar : str
+
 
     class Config:
         orm_mode = True
@@ -52,7 +54,7 @@ class Message(BaseModel):
     user_id: int
     chargestation_id: int
     user: Optional[UserSchema] = None
-
+    
 
 
     class Config:
@@ -138,6 +140,7 @@ class UserResponse(BaseModel):
     session_id: str
     name : str
     userId : int
+    avatar : str
 
 
 

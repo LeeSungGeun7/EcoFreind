@@ -135,7 +135,8 @@ const Login = () => {
     console.log(JSON.stringify(sessionId))
     if (status === 200) {
       localStorage.setItem('session_id', JSON.stringify(sessionId))
-      setUserData({...userdata,islogin:true,email: sessionId.email,name: sessionId.name , userId : sessionId.userId})
+      console.log(JSON.stringify(sessionId))
+      setUserData({islogin:true,email: sessionId.email,name: sessionId.name , userId : sessionId.userId ,avatar : sessionId.avatar})
       navigate('/')
     } else {
       alert("로그인실패")

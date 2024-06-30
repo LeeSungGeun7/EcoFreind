@@ -1,4 +1,6 @@
-import React, { createContext, useState, useContext } from 'react';
+import React, { createContext, useState, useContext, useEffect } from 'react';
+
+import usePersistState from '../hooks/usePersistState';
 
 
 // Create Context object.
@@ -9,14 +11,17 @@ export const AuthContextProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [email, setEmail] = useState("");
 
+  
 
-
-  const [userdata , setUserData] = useState({
+  const [userdata , setUserData] = usePersistState('userData',{
     email : "",
     userId : 0,
     name : "",
-    islogin : false
+    islogin : false,
+    avatar : ""
   })
+ 
+
 
   const [changeId ,setChangeId] = useState("");
 

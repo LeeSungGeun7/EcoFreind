@@ -7,11 +7,23 @@ import { useEffect } from "react";
 import { useAuth } from "../context/AuthContextProvider";
 import { authApi } from "../api/auth";
 import { useLayoutEffect } from "react";
+import { media } from "../styles/media";
+
+
 
 const center = `
 display:flex;
 justify-content: center;
 align-items:center;`
+
+
+const FakeMargin = styled.div`
+    display: none; 
+    ${media.phone`
+        display:block;
+    `}
+    margin:30px;
+`
 
 const Container = styled.div`
     display:flex;
@@ -23,6 +35,11 @@ const Container = styled.div`
     font-family: 'Do Hyeon', sans-serif;
     color:#333333;    
 
+    ${media.phone`
+        display:none;
+
+
+    `}
 
     .logo {
         font-size: 2rem;
@@ -95,7 +112,6 @@ const Header = (props) => {
     const handleLogout = async () => {
        const res =  await authApi.logout()
        if (res.status === 200) {
-          localStorage.removeItem('session_id')
           setUserData({...userdata, islogin:false , email: ''})  
        }
     }
@@ -105,23 +121,24 @@ const Header = (props) => {
 
 
 
-const isExist = async () => {
-    const res = await  authApi.isExist();
-    if (res.data === true) {
-        setUserData({...userdata,islogin:true})
-    } else {
-        setUserData({...userdata,islogin:false})
-    }
-}
+// const isExist = async () => {
+//     const res = await  authApi.isExist();
+//     if (res.data === true) {
+//         setUserData({...userdata,islogin:true})
+//     } else {
+//         setUserData({...userdata,islogin:false})
+//     }
+// }
 
 
-useLayoutEffect(()=>{
-    isExist();
-},[])    
+// useLayoutEffect(()=>{
+//     isExist();
+// },[])    
 
 
     
     return(
+        <>
         <Container overlap={props.overlap} > 
 
             <Menu height={"100px"} top={'20px'}>
@@ -151,9 +168,13 @@ useLayoutEffect(()=>{
             </Menu>
             }
         </Container>
+
+        <FakeMargin/>
+        </>
     );
 };
 
 export default Header;
+
 
 

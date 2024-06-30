@@ -10,6 +10,7 @@ import { userApi } from "../api/user";
 import { BsPencilSquare } from "react-icons/bs";
 import SkeletonLoader, { SkeletonRow } from "../Components/SkeletonLoader";
 import LoadingSquare from "../Components/LoadingSquare";
+import { useAuth } from "../context/AuthContextProvider";
 
 const center = `
 display: flex;
@@ -92,6 +93,10 @@ const SideBar = styled.div`
             width: 34%;
             height: 50px;
             ${center}
+        }
+
+        .active {
+            color : black
         }
     }
 
@@ -235,7 +240,7 @@ const MyInfoItem = ({on ,keys, favdata , setFavData , name , content , data}) =>
 const ImgForm = ({avatar}) => {
     const imgRef = useRef(null)
     const [selectedImage , setSelectedImage] = useState(avatar ? avatar : "/avatar.jpeg");
-    
+    const { setUserData } = useAuth()
     useEffect(()=>{
         setSelectedImage(avatar)
     },[avatar])
@@ -259,6 +264,7 @@ const ImgForm = ({avatar}) => {
             const res = await userApi.getcloudImageURL(form)
             if (res === true) {
                 alert('프로필 사진이 변경되었습니다.')
+                setUserData(prev => ({...prev , avatar: selectedImage}))
             } else {
                 alert('프로필 사진 변경 실패하였습니다.')
             }
@@ -356,9 +362,9 @@ const Mypage = () => {
             <SideBar>
                 {/* <div className="logo">MY</div> */}
                 <div className="menu">
-                    <div  onClick={()=>{setMenu(1)}}> 내 정보</div>
-                    <div  onClick={()=>{setMenu(2)}}> 관심충전소</div>
-                    <div  onClick={()=>{setMenu(3)}}> 정보수정</div>
+                    <div className={`${menu === 1 && 'active'}`} onClick={()=>{setMenu(1)}}> 내 정보</div>
+                    <div className={`${menu === 2 && 'active'}`} onClick={()=>{setMenu(2)}}> 관심충전소</div>
+                    <div className={`${menu === 3 && 'active'}`} onClick={()=>{setMenu(3)}}> 정보수정</div>
                 </div>
             </SideBar>
             <Main>

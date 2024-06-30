@@ -1,8 +1,15 @@
 import React, {useState} from "react";
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
+import { useAuth } from "../context/AuthContextProvider";
+import { media } from "../styles/media";
 import Modal from "../utils/Modal";
 
+
 const Footerst = styled.footer`
+    ${media.phone`
+      display: none;
+    `}
     display : flex;
     width: 100%;
     align-items: center;
@@ -58,11 +65,41 @@ const Footerst = styled.footer`
    }
    `;
 
+   const MobileFooter = styled.div`
+      display: none; 
+      ${media.phone`
+        display:flex;
+        justify-content: space-evenly;
+        align-items:center;
+        width: 100vw;
+        height: 70px;
+        background-color: black;
+      `}
+
+      .avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50px;
+      }
+   `
+   const RouteBtn = styled.button`
+      width: 70px;
+      height: 40px;
+      background-color: white;
+      color : black;
+      border-radius: 30px;
+      border:none;
+      &:hover {
+
+      }
+   `
+
       const Footer = () => {
         const [isModalOpen, setIsModalOpen] = useState(false);
         const [modalContents, setModalContents] = useState("");
         const [modalTitle, setModalTitle] = useState("");
-
+        const {userdata , setUserData} = useAuth()
+        const navi = useNavigate();
         const handleOpenModal = (index) => {
           setIsModalOpen(true);
           if (index === 0) {
@@ -76,12 +113,17 @@ const Footerst = styled.footer`
             setModalTitle("저작권정책");
           }
         };
+
+        const moveRoute = (route_path) => {
+          navi(`/${route_path}`)
+        }
       
         const handleCloseModal = () => {
           setIsModalOpen(false);
           setModalContents("");
         };
         return(
+          <>
         <Footerst>
         <footer>
           <div className="div1">
@@ -101,6 +143,17 @@ const Footerst = styled.footer`
           <Modal isOpen={isModalOpen} onClose={handleCloseModal} 
           contents={modalContents} title1={modalTitle} />
       </Footerst>
+        <MobileFooter>
+            <RouteBtn onClick={()=>{moveRoute('car')}}>car</RouteBtn>
+            {
+              userdata.islogin ?
+            <img onClick={()=>{moveRoute('mypage')}} className="avatar" src={userdata.avatar !== "" ? userdata.avatar :`/avatar.jpeg`}/>
+            : 
+            <RouteBtn onClick={()=>{moveRoute('login')}}>로그인</RouteBtn>
+            }
+            <RouteBtn >temp</RouteBtn>
+        </MobileFooter>
+      </>
         );
       };
     
