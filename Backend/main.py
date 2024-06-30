@@ -216,7 +216,7 @@ async def token(responses : Response,request: Request , db : Session = Depends(g
         if not isUser :
             crud.sign_up_kakao(nickname,email,db)
 
-        user = crud.get_userdata()
+        user = crud.get_userdata(email , db)
 
         user_datas = {"email":  email}
         session_id = secrets.token_hex(32)
