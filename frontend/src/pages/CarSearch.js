@@ -128,8 +128,8 @@ const SelectBox = styled.div`
   height : 50px;
   ${center}
   justify-content: space-evenly;
-  background-color: skyblue ;
-  color:white;
+  background-color: #F8F6F6 ;
+  color:black;
   z-index: 2;
   input {
     width: 30%;

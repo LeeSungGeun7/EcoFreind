@@ -25,7 +25,7 @@ const Container = styled.div`
   .loginbar {
     
     color: #30A7FE;
-    background-color: #EFF2F3;
+    background-color: #F8F6F6;
     box-shadow: 0 14px 28px rgba(0,0,0,0.25);
     display: flex;
     flex-direction: column;
@@ -56,6 +56,14 @@ const Container = styled.div`
       }
       .sign {
         font-size:13px;
+        background-color: black;
+        border-radius:15px;
+        color:white;
+        width: 60px;
+        height: 35px;
+        display:flex;
+        justify-content:center;
+        align-items:center;
       }
 
     }
@@ -77,18 +85,19 @@ const Container = styled.div`
   }
   .login-btn {
     //#30A7FE;
-   
+    color:white;
     border-radius: 10%;
-    background-color:  lightblue;
+    background-color:  #00A3FF;
     border : none;
-    width: 15%;
-    height:10%;
+    width: 11%;
+    height:8%;
     cursor: pointer;
 
   }
   .title {
     font-size: 20px;
     weight: bold;
+    color: black;
   }
   a {
     text-decoration: none;

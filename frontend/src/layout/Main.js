@@ -92,6 +92,13 @@ const Mainst = styled.main`
 
 `;
 
+
+const MainWrapper = styled.main`
+  background-color: silver;
+  width: 100vw;
+  height: 100vh;
+`;
+
 const Main = () => {
   const navigate = useNavigate();
   const [searchValue, setSearchValue] = useState("");
@@ -137,6 +144,11 @@ const Main = () => {
       </div>
    
     </Mainst>
+    // <MainWrapper>
+
+    
+    
+    // </MainWrapper>
   );
   };
 

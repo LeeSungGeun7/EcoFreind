@@ -1,7 +1,7 @@
 import React , { Suspense, lazy, useEffect } from 'react'; 
 import {BrowserRouter as Router , Route , Routes, useNavigate} from 'react-router-dom';
+import LoadingMain from './Components/LoadingMain';
 import { useAuth } from './context/AuthContextProvider';
-
 
 const CarSerach = React.lazy(()=>(import('./pages/CarSearch')));
 const MyPage = React.lazy(()=>(import('./pages/MyPage')));
@@ -22,7 +22,6 @@ function App() {
   const user = localStorage.getItem('userData')
   useEffect(() => {
     if (!user) {
-      // 로그아웃 처리
       handleLogout();
     }
   }, [user]);
@@ -34,7 +33,7 @@ function App() {
   return (
    <>
    <Router>
-      <Suspense fallback={<Layout/>}>
+      <Suspense fallback={<LoadingMain/>}>
       <Routes>
       <Route path="/Car" element={<CarSerach/>}/>
         <Route path="/Car/:searchValue" element={<CarSerach/>} />

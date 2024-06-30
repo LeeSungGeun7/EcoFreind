@@ -37,8 +37,6 @@ const Container = styled.div`
 
     ${media.phone`
         display:none;
-
-
     `}
 
     .logo {

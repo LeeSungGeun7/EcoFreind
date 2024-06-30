@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
 import Header from "../layout/Header";
-import Footer from "../layout/Footer";
 import styled from "styled-components";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { BsEmojiSunglasses  } from "react-icons/bs";
@@ -9,6 +8,7 @@ import { IoMdArrowRoundBack } from "react-icons/io";
 import { elapsedTime } from "../utils/time";
 import { chatApi } from "../api/chat";
 import { userApi } from "../api/user";
+import SkeletonLoader from "../Components/SkeletonLoader";
 
 
 const center = `
@@ -162,10 +162,11 @@ const ServiceCenter = () => {
     const [inputText, setInputText] = useState('');
     const [connected, setConnected] = useState(false);
     const ws = useRef(null);
-
+    const [isLoading , setIsLoading] = useState(false);
     
     const [msg , setMsg] = useState({})
     const getChatMessage = async () => {
+        setIsLoading(true)
         const res = await chatApi.getMessages(id)
         if (res.status === 200) {
             setMessages(res.data)
@@ -175,7 +176,7 @@ const ServiceCenter = () => {
               newMsg[userId] = e.avatar;
             });
             setMsg(newMsg);
-            
+            setIsLoading(false)
         }
     }
     const getUserData = async () => {
@@ -219,9 +220,7 @@ const ServiceCenter = () => {
         if (inputText && ws.current.readyState === WebSocket.OPEN) {
             const messageData = `${currentUser.id}|${inputText}|${currentUser.name}`;
             ws.current.send(messageData);
-            
-          setInputText('');
-          alert(JSON.stringify(messages))
+            setInputText('');
         }
         
     }; 
@@ -269,6 +268,11 @@ const ServiceCenter = () => {
             <Container>
                 <IoMdArrowRoundBack className="back-btn" onClick={()=>{navigate(-1)}}>{'<'}</IoMdArrowRoundBack>
                 <div className="title">{name}</div>
+
+                {
+                    isLoading ? 
+                    <SkeletonLoader/>
+                    :
                 <div className="body" ref={chatRef}> 
                 {
                     messages.map((item,idx)=>{
@@ -282,7 +286,7 @@ const ServiceCenter = () => {
                                 </div>
 
                                 <div className="avatar">
-                                <img className="avatar_img" src={msg[item.user.id]}/>
+                                <img className="avatar_img" src={msg[item.user.id] ? msg[item.user.id] : currentUser.avatar }/>
                                 <div className="time">{elapsedTime(item.created_at)}</div>  
                                 </div>
                                 {/* <div className="avatar">
@@ -294,6 +298,8 @@ const ServiceCenter = () => {
                     })
                 }
                 </div>
+
+            }
                 <div className="send">
                     <input onKeyPress={(e)=>{if(e.key==="Enter"){sendMessage(e)}}} onChange={(e)=>{setInputText(e.target.value)}} value={inputText} type="text" />
                     <button onClick={(e)=>{sendMessage(e)}}>SEND</button>

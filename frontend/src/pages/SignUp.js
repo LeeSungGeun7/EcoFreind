@@ -17,7 +17,7 @@ const Container = styled.div`
 		box-sizing: border-box;
 	}
   .container {
-    background-color: mintcream ;
+    background-color: #EEECEA ;
     display: flex;
     flex-wrap: wrap;
     flex-direction: column;
