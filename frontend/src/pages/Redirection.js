@@ -23,7 +23,7 @@ function redirection() {
   }
 )
     .then((result)=>{
-        setUserData({...userdata , islogin:true , email:result.data[0]})
+        setUserData({...userdata , islogin:true , email:result.data[0] , avatar : result.data[1]})
         navi('/');
     })
   }

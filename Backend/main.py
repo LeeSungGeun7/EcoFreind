@@ -210,11 +210,13 @@ async def token(responses : Response,request: Request , db : Session = Depends(g
 
         email = user_data.get('kakao_account', {}).get('email')
         nickname = user_data.get('properties', {}).get('nickname')
+        
 
         isUser = crud.email_check(email , db)
         if not isUser :
             crud.sign_up_kakao(nickname,email,db)
 
+        user = crud.get_userdata()
 
         user_datas = {"email":  email}
         session_id = secrets.token_hex(32)
@@ -227,7 +229,8 @@ async def token(responses : Response,request: Request , db : Session = Depends(g
             name = nickname,
             email= email,
             session_id=session_id,
-            user="로그인 작업"
+            avatar=user.avatar
+            # user="로그인 작업",
         )
         return email , nickname , access_token
 
