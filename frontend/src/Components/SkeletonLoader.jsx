@@ -10,20 +10,35 @@ const Container = styled.div`
   justify-content: center;
   height: 100%;
   width: 100%;
-  background-color : none;
+  /* background-color : none; */
   z-index: 3;
+  background-color : ${props => props.theme.colors.black3};
 `
 
 const Rows = styled.div`
+  display:flex;
+  justify-content:space-evenly;
+  flex-direction:column;
   margin: 30px;
   height: 80vh;
   width: 100%;
+
+  .item-round {
+    border-radius: 50px;
+    width: 50px;
+    height: 50px;
+  }
   .row-item {
-    height: 20%;
+   
+    flex-direction:row;
+    justify-content:start;
+    height: 30%;
     width: 80%;
   }
   .item {
-   
+   margin-top:15px; 
+   width: 100%;
+   height: 20px;
   }
 `
 
@@ -32,7 +47,8 @@ function SkeletonLoader() {
    
   return (
     <Container>
-        <Skeleton width={'100vw'} height={'100vh'}  className="text"   />
+      <SkeletonRow/>
+        {/* <Skeleton style={{backgroundColor:"black"}} width={'100vw'} height={'100vh'}  className="text"   /> */}
     </Container>
   )
 }
@@ -46,14 +62,24 @@ export const SkeletonRow = () => {
     <Container>
 
         <Rows className=''>
-          <div className='row-item'>
-           <Skeleton className='item'/>
-           </div>
-           <div className='row-item'>
-           <Skeleton className='item'/>
-           </div>
 
+          {
+            [1,2,3].map(()=>{
+              return(
+              <div className='row-item'>
+                <Skeleton className='item-round'/>
+                <Skeleton className='item'/>
+                <Skeleton className='item'/>
+              </div>
+              )
+            })
+        
+          }
+           {/* <div className='row-item'>
            <Skeleton className='item'/>
+           </div> */}
+
+           {/* <Skeleton className='item'/> */}
         </Rows>
 
     </Container>

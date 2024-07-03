@@ -2,8 +2,6 @@ import React, { useEffect, useRef, useState } from "react";
 import Header from "../layout/Header";
 import styled from "styled-components";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { BsEmojiSunglasses  } from "react-icons/bs";
-import { HiOutlineEmojiSad } from "react-icons/hi";
 import { IoMdArrowRoundBack } from "react-icons/io";
 import { elapsedTime } from "../utils/time";
 import { chatApi } from "../api/chat";

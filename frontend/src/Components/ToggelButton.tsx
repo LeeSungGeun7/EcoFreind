@@ -2,7 +2,7 @@ import Button from '@mui/material/Button';
 import styled from 'styled-components';
 import { styled as muiStyled } from '@mui/material/styles';
 import * as React from 'react';
-import { center } from '../styles/theme';
+import { Common } from '../styles/theme';
 
 
 declare module '@mui/material/styles' {
@@ -50,7 +50,7 @@ const TogelButton = ({
     
 
 const Container = styled.div`
-    ${center};
+    ${Common.center};
     border-radius: 50px;
     width: 30px;
     height: 30px;

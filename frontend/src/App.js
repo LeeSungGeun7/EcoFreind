@@ -3,6 +3,7 @@ import {BrowserRouter as Router , Route , Routes, useNavigate} from 'react-route
 import { ThemeProvider } from 'styled-components';
 import LoadingMain from './Components/LoadingMain';
 import { useAuth } from './context/AuthContextProvider';
+
 import { darkTheme, theme } from './styles/theme';
 
 const CarSerach = React.lazy(()=>(import('./pages/CarSearch')));
@@ -14,11 +15,9 @@ const ServiceCenter = lazy(()=>(import('./pages/ServiceCenter')));
 const Payment = lazy(()=>(import('./pages/Payment')));
 const Redirection = lazy(()=>(import('./pages/Redirection')));
 const Temp = lazy(()=>(import('./pages/Test')));
+const NotFound = lazy(()=>(import('./pages/NotFound')));
 
 function App() {
-
-  
-
  
 const {userdata , setUserData , darkmode } = useAuth()
 
@@ -53,6 +52,7 @@ const user = localStorage.getItem('userData')
 
   
         <Route path="/pay" element={<Temp/>} />
+        <Route path="/*" element={<NotFound />} />
 
       </Routes>
       </Suspense>

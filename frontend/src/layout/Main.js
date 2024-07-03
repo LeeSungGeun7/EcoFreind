@@ -166,7 +166,7 @@ const Main = () => {
     // </Mainst>
     <MainWrapper>
       <SliderWrapper>
-
+        메인페이지 작업중 
 
       </SliderWrapper>
 

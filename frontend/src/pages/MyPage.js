@@ -88,7 +88,7 @@ const SideBar = styled.div`
             border-top-right-radius: 10px; */
             /* background-color: #0AD1F8; */
             background-color:  ${props => props.theme.colors.black1};
-            color: white;
+            color : ${props => props.theme.colors.black3};
             width: 34%;
             height: 50px;
             ${center}
@@ -106,7 +106,7 @@ const Main = styled.div`
     width: 100%;
     height: 70%;
     background-color:  ${props => props.theme.colors.black2};
-    color : ${props => props.theme.colors.white};
+    /* color : ${props => props.theme.colors.white}; */
 
 
     @media (min-width: 1000px) {
@@ -155,6 +155,7 @@ const MyInfo = styled.div`
     overflow-y: scroll;
     background-color:none;
     //box-shadow : 1px 1px silver;   
+    color : ${props => props.theme.colors.white};
 `
 
 const Infodetail = styled.div`
@@ -162,7 +163,8 @@ const Infodetail = styled.div`
     justify-content:space-evenly;
     width: 100%;
     height: 200px;
-    background-color: white ;
+    background-color : white;
+    color : ${props => props.theme.colors.black3};
     flex-direction: column;
     font-size: 15px;
 `

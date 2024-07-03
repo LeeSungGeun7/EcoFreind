@@ -12,7 +12,8 @@ export const theme = {
         black2 :  "#F8F6F4",
         black3 : "black",
         blue : "black",
-        white: "black"
+        white: "black",
+
     }
 }
 
@@ -29,8 +30,16 @@ export const darkTheme = {
 
 
 
-export const center = `
+export const Common = 
+
+{
+    center : `
     display: flex;
     justify-content:center;
     align-items : center;
-`
+    `,
+
+    
+
+
+}
