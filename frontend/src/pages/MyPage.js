@@ -25,9 +25,7 @@ const Container = styled.div`
     font-size: 1.5rem;
     ${center}
     flex-direction:column;
-    background-color: #f6f6f6;
-
-    //height: 100vh;
+    background-color:  ${props => props.theme.colors.black2};
     min-height: auto;
     width: 100vw;
 
@@ -52,6 +50,7 @@ const Avatar = styled.div`
         position: relative;
     }
     .modify {
+        color: ${props => props.theme.colors.white};
         font-size: 1rem;
         position: absolute;
         bottom: 10px;
@@ -75,20 +74,20 @@ const SideBar = styled.div`
         height: 30%;
         width: 20%;
         color: skyblue;
+
     }
     .menu {
         ${center}
         justify-content:space-evenly;
         height: 100%;
-        //30
         width: 100%;
-        background-color:skyblue;
         font-size: 1rem;
         
         div {
             /* border-top-left-radius: 10px;
             border-top-right-radius: 10px; */
-            background-color: #0AD1F8;
+            /* background-color: #0AD1F8; */
+            background-color:  ${props => props.theme.colors.black1};
             color: white;
             width: 34%;
             height: 50px;
@@ -96,7 +95,7 @@ const SideBar = styled.div`
         }
 
         .active {
-            color : black
+            color : ${props => props.theme.colors.blue};
         }
     }
 
@@ -106,7 +105,8 @@ const Main = styled.div`
     ${center}
     width: 100%;
     height: 70%;
-    background-color: white;
+    background-color:  ${props => props.theme.colors.black2};
+    color : ${props => props.theme.colors.white};
 
 
     @media (min-width: 1000px) {
@@ -154,10 +154,7 @@ const MyInfo = styled.div`
     height: auto;
     overflow-y: scroll;
     background-color:none;
-    box-shadow : 1px 1px silver;
-
-
-   
+    //box-shadow : 1px 1px silver;   
 `
 
 const Infodetail = styled.div`
@@ -183,7 +180,7 @@ const Item = styled.div`
         width: 50%;
         height: 80px;
         font-size: 19px;
-        border-left : 0.2px solid white;
+       
     }
     .content {
         font-size: 15px;
@@ -360,7 +357,6 @@ const Mypage = () => {
                 
             </Avatar>
             <SideBar>
-                {/* <div className="logo">MY</div> */}
                 <div className="menu">
                     <div className={`${menu === 1 && 'active'}`} onClick={()=>{setMenu(1)}}> 내 정보</div>
                     <div className={`${menu === 2 && 'active'}`} onClick={()=>{setMenu(2)}}> 관심충전소</div>

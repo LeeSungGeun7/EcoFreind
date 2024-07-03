@@ -46,11 +46,13 @@ delwishStation: async (itemId) => {
 addWishStation: async (itemId) => {
   const response = await Axios.post(EF_DOMAIN+ "/addfav",{
     itemId : itemId
-    })
+    });
+
     if (response.status === 200 && response.data === true) {
-      return true
-    } else {
-      return false
+      return true;
+    } 
+    else {
+      return false;
     }
 },
 

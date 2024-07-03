@@ -68,13 +68,17 @@ const Message = styled.div`
 
 
 const Container = styled.div`
-    weight : 100vw;
-    height: 100vh;
+    weight : 100%;
+    height: 90vh;
+    overflow: hidden;
+    position: fixed;
     ${center}
     flex-direction: column;
-    background-color : white;
+    background-color:  ${props => props.theme.colors.black1};
+    color:  ${props => props.theme.colors.white};
     position:relative;
     .back-btn {
+        color:  ${props => props.theme.colors.white};
         position: absolute;
         top: 7%;
         left: 10%;
@@ -102,6 +106,7 @@ const Container = styled.div`
 
     .send {
         display:flex;
+        margin-bottom:25px;
         width: 80%;
         height: 50px;
         border-radius: 30px;
@@ -304,7 +309,7 @@ const ServiceCenter = () => {
                     <input onKeyPress={(e)=>{if(e.key==="Enter"){sendMessage(e)}}} onChange={(e)=>{setInputText(e.target.value)}} value={inputText} type="text" />
                     <button onClick={(e)=>{sendMessage(e)}}>SEND</button>
                 </div>
-                <div className="user">
+                {/* <div className="user">
                     <div>
                         <BsEmojiSunglasses/>
                         <button onClick={()=>{SendClickMessage('이용 가능해요')}}>이용 가능해요</button>
@@ -313,7 +318,7 @@ const ServiceCenter = () => {
                         <HiOutlineEmojiSad/>
                         <button onClick={()=>{SendClickMessage('이용이 안되요')}}>이용이 안되요</button>
                     </div>
-                </div>
+                </div> */}
             </Container>
         {/* <Footer/> */}
         </>

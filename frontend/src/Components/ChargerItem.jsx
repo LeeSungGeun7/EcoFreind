@@ -29,25 +29,30 @@ const ChargerItem = ({data , setLoc }) => {
     useEffect(()=>{
       getFav()
     },[])
-  
     
     const handelFav = async (id) => {
-      if (!fav.has(id)) {
-        console.log(fav)
-        const res = await chargerApi.addWishStation(id);
-  
-         if (res && res === true){
-            setFav(new Set([...fav,id]));
-            }
-      } else {
-         const res = await chargerApi.delwishStation(id);
-         if (res && res === true) {
+      try {
+        if (!fav.has(id)) {
+          console.log(fav);
+          const res = await chargerApi.addWishStation(id);
+    
+          console.log(res);  // Use console.log for debugging
+          if (res === true) {
+            setFav(new Set([...fav, id]));
+          }
+        } else {
+          const res = await chargerApi.delwishStation(id);
+          if (res === true) {
             const newFav = new Set(fav);
             newFav.delete(id);
             setFav(newFav);
-         }
+          }
+        }
+      } catch (error) {
+          navigate('/login');
       }
-    }
+    };
+
     
     return (
       <>

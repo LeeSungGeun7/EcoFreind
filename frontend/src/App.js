@@ -1,7 +1,9 @@
 import React , { Suspense, lazy, useEffect } from 'react'; 
 import {BrowserRouter as Router , Route , Routes, useNavigate} from 'react-router-dom';
+import { ThemeProvider } from 'styled-components';
 import LoadingMain from './Components/LoadingMain';
 import { useAuth } from './context/AuthContextProvider';
+import { darkTheme, theme } from './styles/theme';
 
 const CarSerach = React.lazy(()=>(import('./pages/CarSearch')));
 const MyPage = React.lazy(()=>(import('./pages/MyPage')));
@@ -15,11 +17,13 @@ const Temp = lazy(()=>(import('./pages/Test')));
 
 function App() {
 
+  
 
  
-  const {userdata , setUserData} = useAuth()
+const {userdata , setUserData , darkmode } = useAuth()
 
-  const user = localStorage.getItem('userData')
+const user = localStorage.getItem('userData')
+
   useEffect(() => {
     if (!user) {
       handleLogout();
@@ -32,6 +36,7 @@ function App() {
 
   return (
    <>
+   <ThemeProvider theme={darkmode ? darkTheme : theme}>
    <Router>
       <Suspense fallback={<LoadingMain/>}>
       <Routes>
@@ -52,7 +57,7 @@ function App() {
       </Routes>
       </Suspense>
     </Router>
-    
+    </ThemeProvider>
    </>
   );
 }

@@ -94,10 +94,30 @@ const Mainst = styled.main`
 
 
 const MainWrapper = styled.main`
-  background-color: silver;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  background-color:  ${props => props.theme.colors.black2};
+  transition: background-color 0.2s ease-in, color 0.2s ease-in;
   width: 100vw;
   height: 100vh;
 `;
+
+const SliderWrapper = styled.section`
+  margin: 50px;
+  margin-bottom: 0px;
+  width: 90%;
+  height: 50%;
+  background-color: black;
+`
+
+const Content = styled.section`
+  margin: 50px;
+  width: 90%;
+  height: 50%;
+  background-color: black;
+`
 
 const Main = () => {
   const navigate = useNavigate();
@@ -113,7 +133,7 @@ const Main = () => {
         if (event.key === 'Enter') {
             handleSubmit();
         }
-      }
+  }
   
      
 
@@ -126,29 +146,34 @@ const Main = () => {
     
 
   return (
-    <Mainst>
-      <div className="top">
-        <video
-          src={vdValue}
-          autoPlay
-          muted
-          loop
-          width="100%"
-          height="100%"
-          controls={false}
-        />
-        <div className="Homeinput">
-          <input type="text" className="input" ref={inputEl} value={searchValue} onChange={(e)=>setSearchValue(e.target.value)} onKeyDown={handleKeyDown}/><FaSearch onClick={handleSubmit} className="fa"/>
-          <div className="content">Find your<b style={{color:"#F5F278"}}>#Charge</b> </div>
-        </div>
-      </div>
+    // <Mainst>
+    //   <div className="top">
+    //     <video
+    //       src={vdValue}
+    //       autoPlay
+    //       muted
+    //       loop
+    //       width="100%"
+    //       height="100%"
+    //       controls={false}
+    //     />
+    //     <div className="Homeinput">
+    //       <input type="text" className="input" ref={inputEl} value={searchValue} onChange={(e)=>setSearchValue(e.target.value)} onKeyDown={handleKeyDown}/><FaSearch onClick={handleSubmit} className="fa"/>
+    //       <div className="content">Find your<b style={{color:"#F5F278"}}>#Charge</b> </div>
+    //     </div>
+    //   </div>
    
-    </Mainst>
-    // <MainWrapper>
+    // </Mainst>
+    <MainWrapper>
+      <SliderWrapper>
 
-    
-    
-    // </MainWrapper>
+
+      </SliderWrapper>
+
+      <Content>
+
+      </Content>
+    </MainWrapper>
   );
   };
 

@@ -31,7 +31,7 @@ const Container = styled.div`
   padding : ${props => props.padding};
   height: ${props => props.h};
   width: ${props => props.w};
-  background-color: white ;
+  background-color:  ${props => props.theme.colors.black1};
   position : relative;
 
   .kakao {
@@ -43,6 +43,7 @@ const Container = styled.div`
 
   .group {
     width: 100%;
+    color:  ${props => props.theme.colors.white};
     display: flex ;
     justify-content: center;
     align-items: center;
@@ -57,7 +58,7 @@ const Container = styled.div`
   .filter {
     width: 40px;
     font-size: 1.5rem;
-    color: black;
+    color:  ${props => props.theme.colors.blue};
   }
   .geo-button {
     position: absolute;
@@ -103,9 +104,9 @@ export const Item = styled.div`
   height : 80px;
   margin-bottom: 0.5px;
   width : 100%; 
-  background-color: white;
+  background-color:  ${props => props.theme.colors.black2};
 
-  border: #56F5F3 1px;
+  border: ${props => props.theme.colors.white} 1px;
 
   .title {
     flex-direction:column;
@@ -128,8 +129,10 @@ const SelectBox = styled.div`
   height : 50px;
   ${center}
   justify-content: space-evenly;
-  background-color: #F8F6F6 ;
-  color:black;
+  color:  ${props => props.theme.colors.white};
+  background-color:  ${props => props.theme.colors.black2};
+  /* background-color: #F8F6F6 ; */
+
   z-index: 2;
   input {
     width: 30%;
@@ -166,10 +169,9 @@ padding: 5px;
 const SelectItem = styled.li`
     border-radius: 15px;
     height: 50px;
-    color:black;
+    color : ${props => props.theme.colors.blue};
     ${center}
     ${props => props.type === props.children && css`
-    color: skyblue;
   `}
 `
 
@@ -193,7 +195,7 @@ const NotResult = styled.div`
   ${props => props.val === true && css`
       ${center} 
       height: 100%;
-      background-color: white ;
+      background-color:  ${props => props.theme.colors.black2};
   `}   
 `
 

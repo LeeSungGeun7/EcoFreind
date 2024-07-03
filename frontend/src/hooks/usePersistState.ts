@@ -12,7 +12,6 @@ export default function useLocalStorage<T>(storageKey: string, initialState: T):
     }
   });
   
-
   // state가 변경될 때마다 localStorage를 업데이트합니다.
   useEffect(() => {
     try {

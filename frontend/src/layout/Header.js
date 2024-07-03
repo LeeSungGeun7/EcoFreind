@@ -8,7 +8,8 @@ import { useAuth } from "../context/AuthContextProvider";
 import { authApi } from "../api/auth";
 import { useLayoutEffect } from "react";
 import { media } from "../styles/media";
-
+import ToggelButton from "../Components/ToggelButton";
+import { MdDarkMode ,MdBrightnessLow } from "react-icons/md";
 
 
 const center = `
@@ -34,7 +35,9 @@ const Container = styled.div`
     width: 100%;
     font-family: 'Do Hyeon', sans-serif;
     color:#333333;    
-
+    background-color:  ${props => props.theme.colors.black1};
+    color:  ${props => props.theme.colors.blue};
+    
     ${media.phone`
         display:none;
     `}
@@ -105,7 +108,7 @@ const MenuItem = ({name, addr}) => {
 const Header = (props) => {
     const navigate = useNavigate();
 
-    const {userdata , setUserData} = useAuth()
+    const {darkmode,setDarkMode , userdata , setUserData} = useAuth()
 
     const handleLogout = async () => {
        const res =  await authApi.logout()
@@ -139,6 +142,7 @@ const Header = (props) => {
         <>
         <Container overlap={props.overlap} > 
 
+           <ToggelButton style={{ position:'absolute',left:10,}} falseIcon={<MdBrightnessLow/>} trueIcon={<MdDarkMode/>} state={darkmode} setState={setDarkMode}  />
             <Menu height={"100px"} top={'20px'}>
                 Menu
                 <div className="menu-list">
@@ -162,7 +166,7 @@ const Header = (props) => {
             </Menu>
             :
             <Menu>
-            <button style={{height:"30px", width:"60px"}} onClick={()=>{navigate('/login')}} className="logout">로그인</button>   
+            <button style={{height:"30px", width:"60px"}} onClick={()=>{navigate('/login')}} className="logout">Login</button>   
             </Menu>
             }
         </Container>

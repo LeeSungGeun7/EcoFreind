@@ -7,14 +7,12 @@ import styled from "styled-components";
 import { useAuth } from '../context/AuthContextProvider';
 import { authApi } from '../api/auth';
 
-
-
-//https://imagedelivery.net/6i45l_k8v6cNrhGva7A6BA/e695240c-9c41-4098-9724-4b741c70ca00/avatar
     
 const Container = styled.div`
 
   .Container {
-    background-color: white ;
+
+    background-color: ${props => props.theme.colors.black1} ;
     height: 100vh;
     display: flex;
     flex-wrap: wrap;
@@ -23,15 +21,14 @@ const Container = styled.div`
     align-items: center;
   }
   .loginbar {
-    
-    color: #30A7FE;
-    background-color: #F8F6F6;
+    color : ${props => props.theme.colors.blue};
+    background-color : ${props => props.theme.colors.black2};
     box-shadow: 0 14px 28px rgba(0,0,0,0.25);
     display: flex;
     flex-direction: column;
     align-items:center;
     justify-content: space-evenly;
-    //border: solid 1px black;
+
     @media (max-width: 600px) {
       width: 90%;  
       height: 90%; 
@@ -84,10 +81,10 @@ const Container = styled.div`
     background-color: white;
   }
   .login-btn {
-    //#30A7FE;
-    color:white;
+    
     border-radius: 10%;
-    background-color:  #00A3FF;
+    background-color : ${props => props.theme.colors.blue};
+    color : ${props => props.theme.colors.black1};
     border : none;
     width: 11%;
     height:8%;
@@ -97,11 +94,10 @@ const Container = styled.div`
   .title {
     font-size: 20px;
     weight: bold;
-    color: black;
+    color : ${props => props.theme.colors.blue};
   }
   a {
     text-decoration: none;
-    color: #3
   }
 
   .kakao {
@@ -183,6 +179,6 @@ const Login = () => {
     </Container>
     </>
   );
-          };
+};
 
 export default Login;
