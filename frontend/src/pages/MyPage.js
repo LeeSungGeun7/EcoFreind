@@ -4,13 +4,13 @@ import Header from "../layout/Header";
 import Footer from "../layout/Footer";
 import { FaStar } from "react-icons/fa";
 import { FaCaretDown ,FaCaretUp} from "react-icons/fa";
-import { z } from 'zod';
 import { chargerApi } from "../api/charger";
 import { userApi } from "../api/user";
 import { BsPencilSquare } from "react-icons/bs";
 import SkeletonLoader, { SkeletonRow } from "../Components/SkeletonLoader";
 import LoadingSquare from "../Components/LoadingSquare";
-import { useAuth } from "../context/AuthContextProvider";
+import { useUserStore } from "../store/userState";
+
 
 const center = `
 display: flex;
@@ -239,7 +239,7 @@ const MyInfoItem = ({on ,keys, favdata , setFavData , name , content , data}) =>
 const ImgForm = ({avatar}) => {
     const imgRef = useRef(null)
     const [selectedImage , setSelectedImage] = useState(avatar ? avatar : "/avatar.jpeg");
-    const { setUserData } = useAuth()
+    const { setAvatar} = useUserStore();
     useEffect(()=>{
         setSelectedImage(avatar)
     },[avatar])
@@ -263,7 +263,7 @@ const ImgForm = ({avatar}) => {
             const res = await userApi.getcloudImageURL(form)
             if (res === true) {
                 alert('프로필 사진이 변경되었습니다.')
-                setUserData(prev => ({...prev , avatar: selectedImage}))
+                setAvatar(selectedImage);
             } else {
                 alert('프로필 사진 변경 실패하였습니다.')
             }

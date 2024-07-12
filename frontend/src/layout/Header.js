@@ -3,13 +3,12 @@ import React  from "react";
 import styled  from "styled-components";
 import { useNavigate} from "react-router-dom"; 
 import MyPageBtn from "../Components/MyPageBtn";
-import { useEffect } from "react";
-import { useAuth } from "../context/AuthContextProvider";
 import { authApi } from "../api/auth";
-import { useLayoutEffect } from "react";
 import { media } from "../styles/media";
 import ToggelButton from "../Components/ToggelButton";
 import { MdDarkMode ,MdBrightnessLow } from "react-icons/md";
+import { useDarkmode } from "../store/darkTheme";
+import { useUserStore } from "../store/userState";
 
 
 const center = `
@@ -108,33 +107,17 @@ const MenuItem = ({name, addr}) => {
 const Header = (props) => {
     const navigate = useNavigate();
 
-    const {darkmode,setDarkMode , userdata , setUserData} = useAuth()
+    // const { userdata , setUserData} = useAuth()
+    const { setIsLogin ,isLogin , email } = useUserStore();
+    const { darkmode , setDarkMode } = useDarkmode();
 
     const handleLogout = async () => {
        const res =  await authApi.logout()
        if (res.status === 200) {
-          setUserData({...userdata, islogin:false , email: ''})  
+            setIsLogin(false)
        }
     }
     
-// 최초로그인 로컬스토리지에 세션아이디 저장 
-// 로그아웃시 서버에서 세션제거
-
-
-
-// const isExist = async () => {
-//     const res = await  authApi.isExist();
-//     if (res.data === true) {
-//         setUserData({...userdata,islogin:true})
-//     } else {
-//         setUserData({...userdata,islogin:false})
-//     }
-// }
-
-
-// useLayoutEffect(()=>{
-//     isExist();
-// },[])    
 
 
     
@@ -142,7 +125,7 @@ const Header = (props) => {
         <>
         <Container overlap={props.overlap} > 
 
-           <ToggelButton style={{ position:'absolute',left:10,}} falseIcon={<MdBrightnessLow/>} trueIcon={<MdDarkMode/>} state={darkmode} setState={setDarkMode}  />
+           <ToggelButton style={{ zIndex:5,position:'absolute', right : 30, width: '30px'}} falseIcon={<MdBrightnessLow/>} trueIcon={<MdDarkMode/>} state={darkmode} setState={setDarkMode}  />
             <Menu height={"100px"} top={'20px'}>
                 Menu
                 <div className="menu-list">
@@ -156,7 +139,7 @@ const Header = (props) => {
 
 
             {
-            userdata.islogin ? 
+            isLogin ? 
             <Menu height={"100px"} top={'30px'}>
                  <MyPageBtn/>
                  <div className="menu-list">

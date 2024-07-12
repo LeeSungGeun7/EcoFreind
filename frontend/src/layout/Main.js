@@ -3,6 +3,9 @@ import styled from "styled-components";
 import vd3 from "../images/original-087fcdef6dd7e801b337d6dbdc8c0ba9.mp4";  
 import {  useNavigate} from "react-router-dom"; 
 import { FaSearch } from 'react-icons/fa';
+import Scrollanimation from "./Scrollanimation";
+
+
 
 
 const Mainst = styled.main`
@@ -164,16 +167,19 @@ const Main = () => {
     //   </div>
    
     // </Mainst>
-    <MainWrapper>
-      <SliderWrapper>
-        메인페이지 작업중 
+    <>
+    <Scrollanimation/>
+    </>
+    // <MainWrapper>
+    //   <SliderWrapper>
+    //     메인페이지 작업중 
 
-      </SliderWrapper>
+    //   </SliderWrapper>
 
-      <Content>
+    //   <Content>
 
-      </Content>
-    </MainWrapper>
+    //   </Content>
+    // </MainWrapper>
   );
   };
 

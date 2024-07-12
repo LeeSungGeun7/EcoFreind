@@ -2,13 +2,15 @@ import axios from 'axios';
 import { React ,useEffect  }from 'react';
 import { useNavigate } from 'react-router-dom';
 import { EF_DOMAIN } from '../api/utils';
-import { useAuth } from '../context/AuthContextProvider';
+import { useUserStore } from '../store/userState';
+
 
 
 axios.defaults.withCredentials = true
 
-function redirection() {
-    const {userdata , setUserData} = useAuth()  
+function Redirection() {
+
+    const { setIsLogin ,isLogin , email , setEmail , setAvatar } = useUserStore();
     const navi = useNavigate()
     useEffect(()=>{
     const code = new URL(window.location.toString()).searchParams.get('code');
@@ -23,14 +25,16 @@ function redirection() {
   }
 )
     .then((result)=>{
-        setUserData({...userdata , islogin:true , email:result.data[0] , avatar : result.data[1]})
+        setIsLogin(true)
+        setEmail(result.data[0])
+        setAvatar(result.data[1])
         navi('/');
     })
   }
   },[])  
 }
 
-export default redirection
+export default Redirection
 
 
 // 카카오로그인성공시 로컬스토리지 토큰보관

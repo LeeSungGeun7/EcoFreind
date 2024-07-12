@@ -10,7 +10,7 @@ axios.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response && error.response.status === 401) {
-      localStorage.removeItem('userData');
+      localStorage.removeItem('user-storage');
     }
     return Promise.reject(error);
   }
@@ -23,9 +23,9 @@ export const EF_DOMAIN = isDev
   : 'https://backend-deno-sjdz3b63yq-du.a.run.app';
 
 
-export const getSessionId = () => {
-    const session = localStorage.getItem('session_id');
-    if (!session) return null;
-    const parse = JSON.parse(session);
-    return parse.session_id || null;
-};
+// export const getSessionId = () => {
+//     const session = localStorage.getItem('session_id');
+//     if (!session) return null;
+//     const parse = JSON.parse(session);
+//     return parse.session_id || null;
+// };

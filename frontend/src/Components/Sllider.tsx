@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import styled from "styled-components";
 import { Common } from '../styles/theme';
-
+import {motion} from 'framer-motion';
 
 const Wrapper = styled.div`
     position: relative;
@@ -20,6 +20,7 @@ const Wrapper = styled.div`
 function Sllider({items}:any) {
 
   return (
+    
     <Wrapper>
       {items}
     </Wrapper>

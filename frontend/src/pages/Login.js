@@ -4,8 +4,8 @@ import { Link, useNavigate } from "react-router-dom";
 import Header from "../layout/Header";
 import Footer from "../layout/Footer";
 import styled from "styled-components";
-import { useAuth } from '../context/AuthContextProvider';
 import { authApi } from '../api/auth';
+import { useUserStore } from '../store/userState';
 
     
 const Container = styled.div`
@@ -116,12 +116,11 @@ const Container = styled.div`
 `
 
 const Login = () => {
-    const {userdata , setUserData} = useAuth()
     const navigate = useNavigate(); // 라우터 이동을 하기위해서
     // 키보드 입력
     const [inputId , setInputId] = useState("");
     const [inputPw , setInputPw] = useState("");
-    
+    const { setAvatar,setEmail,setName,setUserId,setIsLogin} = useUserStore();
 
 
     const onChangeId = (e) => {
@@ -136,12 +135,12 @@ const Login = () => {
 
   const onClickLogin = async() => {
     const { data:sessionId , status} = await authApi.memberLogin(inputId,inputPw)
-    
-    console.log(JSON.stringify(sessionId))
     if (status === 200) {
-      localStorage.setItem('session_id', JSON.stringify(sessionId))
-      console.log(JSON.stringify(sessionId))
-      setUserData({islogin:true,email: sessionId.email,name: sessionId.name , userId : sessionId.userId ,avatar : sessionId.avatar})
+      setAvatar(sessionId.avatar)
+      setEmail(sessionId.email)
+      setName(sessionId.name)
+      setUserId(sessionId.userId)
+      setIsLogin(true)
       navigate('/')
     } else {
       alert("로그인실패")

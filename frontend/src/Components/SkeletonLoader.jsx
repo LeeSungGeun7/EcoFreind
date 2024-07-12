@@ -12,7 +12,7 @@ const Container = styled.div`
   width: 100%;
   /* background-color : none; */
   z-index: 3;
-  background-color : ${props => props.theme.colors.black3};
+  background-color : ${props => props.theme.colors.black2};
 `
 
 const Rows = styled.div`
