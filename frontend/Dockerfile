@@ -1,4 +1,4 @@
-FROM node:14
+FROM node:v16.20.0
 
 WORKDIR /app/frontend
 
