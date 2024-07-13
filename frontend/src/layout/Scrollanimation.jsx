@@ -24,7 +24,7 @@ function Scrollanimaiton() {
 
   return (
     <Main className="">
-
+        
     </Main>
   );
 }

@@ -240,12 +240,24 @@ def search_stations(search_request ,db: Session ):
     return query.offset(search_request.skip).limit(50).all()
 
 
-def get_user(db:Session ,email:str , password:str):
-    user = db.query(models.User).filter(
-        models.User.email == email
-        and models.User.password == password
-    ).first()
-    return user  
+# pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+# def verify_password(plain_password, hashed_password):
+#     return pwd_context.verify(plain_password, hashed_password)
+
+def get_user(db: Session, email: str, password: str):
+    user = db.query(models.User).filter(models.User.email == email).first()
+    print(user.password)
+    if user and password == user.password:
+        return user
+    return None
+
+# def get_user(db:Session ,email:str , password:str):
+#     user = db.query(models.User).filter(
+#         models.User.email == email
+#         and models.User.password == password
+#     ).first()
+#     return user  
 
 
 def change_avatar(db:Session ,email:str , image : str ):

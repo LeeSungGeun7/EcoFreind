@@ -6,6 +6,8 @@ import Footer from "../layout/Footer";
 import styled from "styled-components";
 import { authApi } from '../api/auth';
 import { useUserStore } from '../store/userState';
+import LoginLoading from '../Components/Loading/LoginLoading.tsx';
+import { useQuery } from '@tanstack/react-query'
 
     
 const Container = styled.div`
@@ -120,6 +122,8 @@ const Login = () => {
     // 키보드 입력
     const [inputId , setInputId] = useState("");
     const [inputPw , setInputPw] = useState("");
+    const [loading , setLoading] = useState(false);
+
     const { setAvatar,setEmail,setName,setUserId,setIsLogin} = useUserStore();
 
 
@@ -135,14 +139,18 @@ const Login = () => {
 
   const onClickLogin = async() => {
     const { data:sessionId , status} = await authApi.memberLogin(inputId,inputPw)
-    if (status === 200) {
+    setLoading(true);
+    
+    if (status === 200 && sessionId) {
+      setLoading(false)
       setAvatar(sessionId.avatar)
       setEmail(sessionId.email)
       setName(sessionId.name)
       setUserId(sessionId.userId)
       setIsLogin(true)
       navigate('/')
-    } else {
+    } else if (status === 422){
+      setLoading(false)
       alert("로그인실패")
     }
   }
@@ -153,7 +161,7 @@ const Login = () => {
     <>
     <Header/>
     <Container>
-      
+
       <div className="Container">
 
         <div className="loginbar">
@@ -166,11 +174,20 @@ const Login = () => {
 
           <input type="text" placeholder="이메일 입력" value={inputId} onChange={onChangeId} />
           <input type="password" placeholder="비밀번호 입력" value={inputPw} onChange={onChangePw} />
+
+
+          {
+            loading ?
+            <LoginLoading/>
+            :
+            <>
           <button className='login-btn' onClick={onClickLogin}>Login</button>
           
           <Link className='kakao' to={`https://kauth.kakao.com/oauth/authorize?client_id=${process.env.REACT_APP_KAKAO_REST_API_KEY}&redirect_uri=${process.env.REACT_APP_KAKAO_REDIRECT_URI}&response_type=code`}>
             <img src={'/kakaoLogin.webp'} alt="" />
           </Link>  
+          </>
+            }
 
         </div>
       </div>

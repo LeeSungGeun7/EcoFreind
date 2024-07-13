@@ -362,6 +362,7 @@ async def read_root(
     user_data: schemas.UserCreateRequest,
     db: Session = Depends(get_db_session)
 ):
+    print( user_data.email, user_data.password)
     user = crud.get_user(db, user_data.email, user_data.password)
     if user:
         session_id = secrets.token_hex(32)

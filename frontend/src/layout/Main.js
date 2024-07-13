@@ -1,126 +1,68 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useMemo, useCallback } from "react";
 import styled from "styled-components";
-import vd3 from "../images/original-087fcdef6dd7e801b337d6dbdc8c0ba9.mp4";  
 import {  useNavigate} from "react-router-dom"; 
 import { FaSearch } from 'react-icons/fa';
 import Scrollanimation from "./Scrollanimation";
+import { motion } from "framer-motion";
+import { duration } from "@mui/material";
 
 
 
-
-const Mainst = styled.main`
-  margin-bottom: 50px;
-  width: 100vw;
-  display: flex;
-    justify-content:center;
-    align-items:center;
-  .top {
-    display: flex;
-    justify-content:center;
-    align-items:center;
-    background-color: black;
-    background-repeat: no-repeat;
-    background-size: contain;
-    border-radius: 15px;
-    width: 90.5%;
-    height: 90vh;
-  }
-  .top video {
-    object-fit: cover;
-    width: 100%;
-    border-radius: 15px;
-
-  }
-  
-  .Homeinput {
-    left: 50%;
-    bottom: 70%;
-		right:  50%; 
-		transform: translate(-50%, -50%);
-    position: absolute;
-    width: 25%;
-
-    width: 50%;
-    height: 30px;
-    margin: 10px auto;
-    font-size: 15px;
-    color: #222222;
-    border: none;
-  }
-  .Homeinput button {
-    width: 15%;
-    color: white;
-
-    border-top-right-radius: 25%;
-    border-bottom-right-radius: 25%;
-    background-color: #333333;
-    border: none;
-  }
-
-  .Homeinput input {
-    font-weight: bold;
-    outline: none;
-    padding-left: 20px;
-    position: relative;
-    border: 1px solid #F1F1F1;
-    border-radius: 50px;
-    width: 100%;
-    height: 100%;
-    right:0%;
-  }
-  .content {
-    position: absolute;
-    color: white;
-    font-size: 50px;
-    font-family:'Do Hyeon', sans-serif;
-    top : 90%;
-    left: 0;
-  }
-  .fa {
-    color: #808080;
-    position: absolute;
-    display: flex;
-  justify-content: space-between;
-  position: absolute;
-
-  bottom: 5px;  
-  left: 90%;
-  }
-  .mainitem {
-    border-radius: 15px;
-    width: 92.5%;
-    height: 100vh;
-    overflow: hidden;
-  }
-
-`;
 
 
 const MainWrapper = styled.main`
   display:flex;
-  flex-direction:column;
   align-items:center;
   justify-content:center;
   background-color:  ${props => props.theme.colors.black2};
   transition: background-color 0.2s ease-in, color 0.2s ease-in;
   width: 100vw;
-  height: 100vh;
+  height: 90vh;
+  padding:40px;
 `;
 
-const SliderWrapper = styled.section`
-  margin: 50px;
-  margin-bottom: 0px;
-  width: 90%;
+const Content = styled.main`
+  display:flex; 
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  background-color:  ${props => props.theme.colors.blue};
+  transition: background-color 0.2s ease-in, color 0.2s ease-in;
+  width: 100vw;
+  height: 1000vh;
+`;
+
+
+const TypeGraph = styled.div`
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  width: 40%;
+  margin:30px;
   height: 50%;
-  background-color: black;
+  background-color: ${props => props.theme.colors.black2};
+  color: ${props => props.theme.colors.blue};
+
+  h1 {
+    font-size: 50px;
+    /* color: ${props => props.theme.colors.black1} */
+  }
+  .main_img {
+    width: 320px;
+    height: 400px;
+  }
 `
 
-const Content = styled.section`
-  margin: 50px;
-  width: 90%;
-  height: 50%;
-  background-color: black;
+const Input = styled.input`
+  width: 80%;
+  padding: 10px;
+  border-radius: 20px;
+  border : 1px solid black;
 `
+
+const SearchBar = styled
+
 
 const Main = () => {
   const navigate = useNavigate();
@@ -140,47 +82,50 @@ const Main = () => {
   
      
 
-
-  const [vdValue, setVdValue] = useState(vd3);
- 
+const BottomUpTransition = useCallback(({children ,duration = 0.5 , delay ,...props}) => {
+  return (
+    <motion.div
+    initial={{ y: 100, opacity: 0 }}
+    animate={{ y: 0, opacity: 1 }}
+    transition={{ duration , delay }}
+    {...props}
+    >
+      {children}
+    </motion.div>
+  )
+},[duration])
 
 
 
     
 
   return (
-    // <Mainst>
-    //   <div className="top">
-    //     <video
-    //       src={vdValue}
-    //       autoPlay
-    //       muted
-    //       loop
-    //       width="100%"
-    //       height="100%"
-    //       controls={false}
-    //     />
-    //     <div className="Homeinput">
-    //       <input type="text" className="input" ref={inputEl} value={searchValue} onChange={(e)=>setSearchValue(e.target.value)} onKeyDown={handleKeyDown}/><FaSearch onClick={handleSubmit} className="fa"/>
-    //       <div className="content">Find your<b style={{color:"#F5F278"}}>#Charge</b> </div>
-    //     </div>
-    //   </div>
-   
-    // </Mainst>
     <>
-    <Scrollanimation/>
+    <MainWrapper>
+      <TypeGraph>
+          <BottomUpTransition>
+          <h1>Charge_Station</h1>
+          </BottomUpTransition>
+          
+          <BottomUpTransition>
+            <h1>Search </h1>   
+          </BottomUpTransition> 
+            <BottomUpTransition duration={0.5} delay={0.5}>
+              <Input onChange={(e)=>{setSearchValue(e.target.value)}} onKeyDown={(e)=>{{handleKeyDown(e)}}}  />
+            </BottomUpTransition>
+      </TypeGraph>
+      <TypeGraph>
+          <BottomUpTransition duration={0.5} delay={0.5}>
+            <img className="main_img" src={'/image/example2.png'} alt="" />
+          </BottomUpTransition>
+      </TypeGraph>
+    </MainWrapper>
+    <Content>
+      
+
+    </Content>
     </>
-    // <MainWrapper>
-    //   <SliderWrapper>
-    //     메인페이지 작업중 
-
-    //   </SliderWrapper>
-
-    //   <Content>
-
-    //   </Content>
-    // </MainWrapper>
+   
   );
-  };
-
+  }
 export default Main;

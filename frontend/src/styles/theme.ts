@@ -38,8 +38,4 @@ export const Common =
     justify-content:center;
     align-items : center;
     `,
-
-    
-
-
 }
