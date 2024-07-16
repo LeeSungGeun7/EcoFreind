@@ -13,6 +13,8 @@ import { chargerApi } from "../api/charger";
 import SkeletonLoader from "../Components/SkeletonLoader";
 import useIntersectionObserver from "../hooks/useIntersectionObserver";
 import { useCallback } from "react";
+import { media } from "../styles/media";
+import Footer from "../layout/Footer";
 
 const center = `
 display: flex ;
@@ -38,6 +40,9 @@ const Container = styled.div`
     @media (min-width: 1000px) {
       width: 100%;  
     } 
+    ${media.phone`
+    width: 100%;
+  `}
     height: 100%;
   }
 
@@ -93,6 +98,10 @@ const ListContainer = styled.div`
       width: 100%;  
   } 
 
+  ${media.phone`
+    width: 100%;
+  `}
+
   background-color: silver;
   overflow-y: scroll;
 `
@@ -126,6 +135,9 @@ const SelectBox = styled.div`
   @media (min-width: 1000px) {
       width: 100%;  
   } 
+  ${media.phone`
+    width: 100%;
+  `}
   height : 50px;
   ${center}
   justify-content: space-evenly;
@@ -392,7 +404,7 @@ useEffect(() => {
          
       </Container>
         <Filter isOpen={filterOpen}  />        
-
+            <Footer/>
       </>
     );    
   });

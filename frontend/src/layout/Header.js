@@ -17,13 +17,7 @@ justify-content: center;
 align-items:center;`
 
 
-const FakeMargin = styled.div`
-    display: none; 
-    ${media.phone`
-        display:block;
-    `}
-    margin:30px;
-`
+
 
 const Container = styled.div`
     display:flex;
@@ -155,7 +149,7 @@ const Header = (props) => {
             }
         </Container>
 
-        <FakeMargin/>
+
         </>
     );
 };

@@ -152,6 +152,7 @@ const MyInfo = styled.div`
     align-items:start;
     width: 100%;
     height: auto;
+    min-height: 60vh;
     overflow-y: scroll;
     background-color:none;
     //box-shadow : 1px 1px silver;   
