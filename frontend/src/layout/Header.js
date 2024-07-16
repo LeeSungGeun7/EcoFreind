@@ -125,14 +125,15 @@ const Header = (props) => {
         <>
         <Container overlap={props.overlap} > 
 
-           <ToggelButton style={{ zIndex:5,position:'absolute', right : 30, width: '30px'}} falseIcon={<MdBrightnessLow/>} trueIcon={<MdDarkMode/>} state={darkmode} setState={setDarkMode}  />
+           
             <Menu height={"100px"} top={'20px'}>
-                Menu
+            <ToggelButton falseIcon={<MdBrightnessLow/>} trueIcon={<MdDarkMode/>} state={darkmode} setState={setDarkMode}  />
+                {/* Menu
                 <div className="menu-list">
                     <MenuItem addr={"car"} name={"전기차 충전소"}  />
                     <MenuItem addr={"pay"} name={"페이먼츠"}  />
                     <MenuItem addr={"service"} name={"고객센터"}  />
-                </div>
+                </div> */}
             </Menu>
 
              <div className="logo"  onClick={()=> {navigate("/")}}>Eco Friend</div>

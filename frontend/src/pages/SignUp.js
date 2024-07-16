@@ -1,178 +1,196 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import styled from "styled-components";
 import Header from "../layout/Header";
-import arrow from "../images/right-arrow.png"
 import AxiosApi from "../api/AxiosApi";
 import { useLocation, useNavigate } from "react-router-dom";
 import { z } from 'zod';
 import { authApi } from "../api/auth";
+import { motion } from "framer-motion";
+import { media } from "../styles/media";
+import { Common } from "../styles/theme";
+import TextField from '@mui/material/TextField';
+import { Button } from "@mui/material";
+import debounce  from 'lodash/debounce';
+import { FaArrowRight ,FaCheck } from "react-icons/fa";
+
+
 
 
 const Container = styled.div`
-	p {
-		color : pink;
-		font-size: 15px;
+	position:relative;
+	display:flex;
+	justify-content:center;
+	align-items:center;
+	background-color: white;
+	flex-direction:column;
+	width: 100vw;
+	height: 100vh;
+	.right {
+		font-size: 2rem;
+		position: absolute;
+		bottom: 10%;
+		right: 10%;
 	}
-	* {
-		box-sizing: border-box;
-	}
-  .container {
-    background-color: #EEECEA ;
-    display: flex;
-    flex-wrap: wrap;
-    flex-direction: column;
-    justify-content: space-evenly;
-    align-items: center;
-    padding: 10px;
-  }
-  .signUp {
-    width: 450px;
-    height: auto;
-    background-color: white;
-    padding: 0 50px;
-    margin-bottom: 20px;
-    box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
-    display: flex;
-    flex-direction: column;
-  }
-  h1 {
-    align-self: center;
-  }
-	.inputBox{
-		margin-top: 25px;
-	}
-	.Name {
-		margin-top: 10px;
-	}
-	label {
-		font-weight: bold;
-		font-size: 1.2rem;
-	}
-	.do {
-		background-color: #fff;
-		color: white;
-		margin-bottom: 40px;
-		margin-top: auto;
-		margin-left: auto;
-	}
-	.do:hover {
-		background-color: #f5f5f5;
-	}
-	.do:active {
-		background-color: #ededed;
-	}
-	.button {
-		width: 60px;
-		height: 60px;
-		border: none;
-		border-radius: 60px;
-		font-size: 1.5rem;
-	}
-	.arrow {
-		height: 100%;
-		width: 100%;
-	}
-	.check{
-		border: none;
-		background-color: #ccc;
-		border-radius: 5px;
-		box-shadow: 0 2px 3px rgba(0,0,0,0.25), 0 1.5px 1.5px rgba(0,0,0,0.22);
-		margin-left: 10px;
-		height: 25px;
-	}
-	.check:active {
-		background-color: #b0b0b0;
-	}
-	.inputInfo {
+	.step {
 		width: 80%;
+		height:90px;
+
+		/* background-color:silver; */
+
+		display:flex;
+		justify-content:end;
+		align-items:center;
+		${
+		media.phone`
+		width: 100%;
+		` 
+		}
+	
 	}
-	.btn-confirm {
-		height: 45px;
-		width: 35%;
-		border: none;
-		background-color: royalblue;
-		color: white;
+	.allow-container {
+		height: 40%;
 	}
-	.btn-confirm:active {
-		background-color: #25a;
+	.all-btn {
+		padding : 1rem;
+		background-color: black;
+		color:white;
+		border:none;
 	}
-	.confirm {
-		height: 45px;
-		width: 65%;
-		padding: 0 2vw;
-		outline: none;
-		border: none;
-		background-color: #eee;
-	}
-	.success {
-    color: royalblue;
-		font-size: .5rem;
-  }
-  .error {
-    color: red;
-		font-size: .5rem;
-  }
-	select {
-		height: 25px;
-		width: 20%;
-		outline: none;
-		border: none;
-		background-color: #f3f3f3;
-		margin-right: 7px;
-	}
-	.tel {
-		border: none;
-		background-color: #eee;
-		width: 25%;
-		height: 25px;
-		margin: 0 7px;
-		outline: none;
-		padding: 0 15px;
-	}
-`
-const Input = styled.input`
-	width: 100%;
-	height: 25px;
-	border-left-width: 0;
-	border-right-width: 0;
-	border-top-width: 0;
-	border-bottom-width: 1px;
-	outline: none;
-	margin-top: 5px;
-	font-size: 1rem;
 	
 `
+
+const FormBar = styled(motion.form)`
+	${Common.center}
+	justify-content:space-evenly;
+	flex-direction:column;
+	/* background-color: ${props=> props.theme.colors.blue}; */
+	
+	width: 80%;
+	height: 70%;
+	
+	${
+	media.phone`
+	width: 100%;
+	height: 100%;
+	` 
+	}
+	.textgroup {
+		${Common.center};
+		width : 100%;
+		justify-content: start;
+	}
+	.input {
+		width : 70%;
+		margin: 20px;
+		${media.phone`
+			width: 70%;
+			margin : 10px;
+			margin-left: 30px;
+		`}
+	}
+	button {
+		margin : auto;
+		${media.phone`
+			font-size: 0.6rem;
+			width: 20px;
+			//margin : 10px;
+		`}
+		font-size: 0.7rem;
+
+
+
+		
+		background-color: ${props=> props.theme.colors.white};
+	}
+`
+
+const StepsContainer = styled(motion.div)`
+	margin-right : auto;
+	display:flex;
+	justify-content: space-evenly;
+	width: 100%;
+
+	div {
+		width: 70px;
+		height: 70px;
+		color: blue;
+		background-color: white;
+		border-radius: 50px;
+		font-size: 0.8rem;
+		${Common.center}
+		color:white;
+	}
+	.step-1 {
+		background-color : ${props=> props.step === 1 ? props.theme.colors.blue : 'silver'};
+		background-color : ${props=> props.step > 1 && '#98FB98'};
+		
+	}
+	.step-2 {
+		background-color : ${props=> props.step === 2 ? props.theme.colors.blue : 'silver'};
+		background-color : ${props=> props.step > 2 && '#98FB98'};
+		color:white;
+	}
+	.step-3 {
+		background-color : ${props=> props.step === 3 ? props.theme.colors.blue : 'silver'};
+	}
+`
+
+const Steps = ({step}) => {
+	return(
+		<>
+		 <StepsContainer step={step}>
+			<div className="step-1">
+				정보입력
+			</div>	
+			<div className="step-2">
+				약관동의
+			</div>	
+			<div className="step-3">
+				완료
+			</div>		
+		 </StepsContainer>
+		</>
+	)
+}
+
+
 const SignUp = () => {
 	const navigate = useNavigate("");
 	// 입력 란
 	const [errors, setErrors] = useState({
 		email: null,
 	});
+	const SignUpSchema = z.object({
+		name: z.string().min(1,"최소 1글자이상 적어주세요").max(10,"글자수 10자 초과하셨습니다."),
+		email: z.string().email({message:"유효하지않은 이메일 형식"}),
+		password: z.string().regex(/^(?=.*[a-zA-Z])(?=.*\d)/, "비밀번호는 영문자와 숫자가 포함되어야 합니다"),
+		passwordCheck : z.string(),
+		emailcheck: z.boolean(),
+	  })
+	
+
+	  const SignUpCheckSchema = SignUpSchema.refine(data => data.emailcheck === true, {
+			message: "이메일 인증이 되지않았습니다.",
+			path: ["email"],
+		  })
+		  .refine(data => data.password === data.passwordCheck, {
+			message: "패스워드가 일치하지 않습니다.",
+			path: ["passwordCheck"]
+		  })
+	  ;
+
 	const [formData , setFormData] = useState({
 		name : "" ,
 		email : "" , 
 		password : "" ,
-		gender : "" ,
-		phone : "" , 
-		address : "" ,	
+		passwordCheck : "",
 		emailcheck : false 
 	})
-	const SignUpSchema = z.object({
-		name: z.string().min(1,"최소 1글자이상 적어주세요").max(10,"글자수 10자 초과하셨습니다."),
-		email: z.string().email({message:"유효하지않은 이메일 형식"}),
-		gender : z.string().min(1,"성별을 선택해주세요") ,
-		phone : z.string().min(10,"핸드폰 번호를 입력해주세요"),
-		address: z.string().min(1,"주소를 입력해주세요"),
-		password: z.string().min(10).regex(/^(?=.*[a-zA-Z])(?=.*\d)/, "비밀번호는 영문자와 숫자가 포함되어야 합니다"),
-		emailcheck: z.boolean(),
-	  })
-	  .refine(data => data.emailcheck === true, {
-		message: "이메일 인증이 되지않았습니다.",
-		path: ["email"],
-	  })
 	
-	  ;
-
+	const [ServiceAllowCheck , setServiceAllowCheck] = useState({
+		service : false ,
+		location : false 
+	})
 
 
 	// 중복 확인
@@ -184,24 +202,11 @@ const SignUp = () => {
 
 	const [keyConfirm, setKeyConfirm] = useState(false);
 
-
-	// 이메일 정규식 확인
-	const onChangeEmail = (e) => {
-		const newEmail = e.target.value;
-		setFormData({...formData, email: newEmail});
-		
-		try {
-		  SignUpSchema.shape.email.parse(newEmail);
-		  setErrors({...errors, email: null});
-		} catch (error) {
-			console.log(error)
-		//   setErrors({...errors, email: error.errors[0].message});
-		}
-	  };
-
-	const onChangeGender = (e) => {
-		setFormData({...formData,gender:e.target.value});
+	const err = () => {
+		console.log(JSON.stringify(formData));
 	}
+
+
 
 	// 중복확인
 	const onClickEmailCheck = async () => {
@@ -211,6 +216,7 @@ const SignUp = () => {
 				setErrors({...errors, email: "이미 존재 하는 이메일 입니다."})
 			} else {
 				setEmailConfirm(true)
+				onClickGetKey();
 			}
 		}
 	}
@@ -226,6 +232,15 @@ const SignUp = () => {
 			}
 		}
 	}
+
+
+	const passwordCheck = () => {
+		if (formData.passwordCheck !== formData.password) {
+			setErrors({...errors,passwordCheck : false})
+		  }
+	}
+
+	
 
 	
 
@@ -250,6 +265,21 @@ const SignUp = () => {
 	};
 
 
+	const nextStepForm = async () =>  {
+		try {
+		SignUpCheckSchema.parse(formData)
+		} catch (error) {
+			const formattedErrors = {};
+			error.errors.forEach(e => {
+			formattedErrors[e.path[0]] = e.message;
+			});
+			setErrors(formattedErrors);
+			alert('not valid')
+			return
+		}
+		nextStep();
+	}
+
 
 	const onClickGetKey = async () => {
 		const res = await authApi.codesend(formData.email);
@@ -259,122 +289,222 @@ const SignUp = () => {
 		} 
 	}
 
-	const handleonChange = (e, set , setVal , property) => {
-		set({...setVal , property : e.target.value })
+	const [step, setStep] = useState(1);
+	const nextStep = () => { setStep(step+1) }
+	const prevStep = () => { setStep(step-1) }
+
+
+
+	const handelChange = debounce((e , name) => {
+		const newValue = e.target.value 
+
+		setFormData(prevData => ({...prevData, [name] : newValue}) )
+
+
+		if (SignUpSchema && SignUpSchema.shape[name]) {
+			const validationResult = SignUpSchema.shape[name].safeParse(newValue);
+			if (!validationResult.success) {
+			  setErrors(prevErrors => ({
+				...prevErrors,
+				[name]: validationResult.error.errors[0].message
+			  }));
+			} else {
+			  setErrors(prevErrors => ({...prevErrors, [name]: null}));
+			}
+		}		
+	},200)		
+
+
+	const handleAllCheck = () => {
+		setServiceAllowCheck({ service:true , location: true})
 	}
 
-	const onChangeKey = (e) => {
-		setKeyCode(e.target.value);
-	}
-
-	const onChangeAddress = (e) => {
-		setFormData({...formData,address:e.target.value});
-	}
-
-	const onChangePwd = (e) => {
-		setFormData({...formData,password: e.target.value});
+	const handleCheck = () => {
+		setServiceAllowCheck({ service:true , location: true})
 	}
 
 
 
-	const onChangePhone = e => {
-		e.target.value = e.target.value.replace(/[^0-9]/g, '').replace(/^(\d{2,3})(\d{3,4})(\d{4})$/, `$1-$2-$3`);
-		setFormData({...formData,phone:e.target.value});
-	}
+	switch (step) {
+		case 1:
+			return(
+				
+			<>
+			<Header/>
+			<Container>
+				{
+					step < 3 &&
+					errors &&
+					<FaArrowRight onClick={nextStepForm} className="right"/>
+				}
+			<div className="step">
+				<Steps step={step}/>				
+			</div>
+				<FormBar onSubmit={ handleSubmit }
+				initial={{ opacity: 0 }}
+				animate={{ opacity: 1 }}
+				exit={{ opacity: 0 }}
+				>
 
-	
-	const openDaumAddress = () => {
-		new window.daum.Postcode({
-      oncomplete: function(data) {
-        setFormData({...formData,address:data.address});
-      },
-    }).open();
-	}
-
-
-	
-
-	return (
-		<Container>
-			<Header />
-			<form onSubmit={handleSubmit} className="container">
-				<div className="signUp">
-					<h1>회원가입</h1>
-					<div className="inputBox Name">
-						<label id="name">이름</label>
-						<Input name="name" type="text" placeholder="ex) 홍길동" value={formData.name} onChange={e => { setFormData({...formData,name:e.target.value}) }} />
-						{errors.name && <p >{errors.name}</p>}
-					</div>
-					<div className="inputBox">
-						<label id="gender">성별</label>
-						<br></br>
-						<select name="gender" onChange={onChangeGender}>
-							<option value="">선택</option>
-							<option value="M">남자</option>
-							<option value="F">여자</option>
-						</select>
-						{errors.gender && <p>{errors.gender}</p>}
-					</div>
-					<div className="inputBox">
-						<label  id="email">이메일</label><br></br>
-						<Input
-							disabled={formData.emailcheck}
-							className="inputInfo"
-							name="email"
-							type="text"
-							placeholder="ex) example@example.com"
-							value={formData.email}
-							onChange={onChangeEmail}
+					<div className="textgroup">
+						<TextField
+						className="input"
+						onChange={(e)=>{handelChange(e,'name')}}
+						error={!!errors.name}
+						helperText={errors.name}
+						name="name"
+						id="name"
+						label="닉네임"
 						/>
-						<button disabled={formData.emailcheck} className="check" onClick={onClickEmailCheck}>중복확인</button>
-						{errors.email && <p>{errors.email}</p>}
 					</div>
-					{/* {formData.email.length > 0 && <span className={`${emailReg && emailConfirm ? "success" : "error"}`}>{idMessage}</span>} */}
-
-					{emailConfirm &&
-						<div className="inputBox">
-							<input disabled={formData.emailcheck} className="confirm" type="text" placeholder="인증번호 입력" onChange={onChangeKey} />
-							{	
-								!keyConfirm ? 
-								<button disabled={formData.emailcheck} className="btn-confirm" onClick={onClickGetKey}>인증번호 발급</button>
-								: 
-								<button disabled={formData.emailcheck} className="btn-confirm" onClick={emailcodeCheck}>인증번호 확인</button>
-							}
-							{/* <button className="check" onClick={onConfirmKeyCode}>인증하기</button>  */}
-						</div>
+					
+					<div className="textgroup">
+					<TextField
+					className="input"
+					name="email"
+					error={!!errors.email}
+  					helperText={errors.email}
+					onChange={(e)=>{handelChange(e,'email')}}
+					id="outlined-error"
+					label="이메일"
+					/>
+					{
+						!emailConfirm &&
+						<Button disabled={errors.email} onClick={onClickEmailCheck}>인증코드</Button>
 					}
-					<div className="inputBox">
-						<label id="password">비밀번호</label>
-						<Input
-							name="password"
-							type="password"
-							placeholder="영문자, 숫자, 10~25자"
-							value={formData.password}
-							onChange={onChangePwd}
-						/>
-						{errors.password && <p>{errors.password}</p>}
-						{/* {formData.pwd.length > 0 && <span className={`${pwdReg ? "success" : "error"}`}>{pwMessage}</span>} */}
+
 					</div>
-					<div className="inputBox">
-						<label id="phone">전화번호</label>
-						<Input maxLength={13} name="phone" type="text" placeholder="'-' 제외하고 입력" value={formData.phone} onChange={onChangePhone}/>
-						{errors.phone && <p>{errors.phone}</p>}
+					{
+					emailConfirm && 
+					<div className="textgroup">
+					<TextField	
+					className="input"
+					error={!!errors.password}
+					helperText={errors.password}
+					onChange={(e)=>{setKeyCode(e.target.value)}}
+					type="number"
+					maxlength={8}
+					id="outlined-error"
+					label="이메일 코드키"
+					/>
+					<Button onClick={emailcodeCheck}>인증코드 확인</Button> 
 					</div>
-					<div className="inputBox">
-						<label id="addr">주소</label>
-						<br></br>
-						<Input name="address" className="inputInfo" type="addrdess" placeholder="ex) 서울특별시 강남구 테헤란로" value={formData.address} onChange={onChangeAddress}/>
-						<button className="check"  onClick={openDaumAddress}>주소찾기</button>
-						{errors.address && <p>{errors.address}</p>}
+					}
+					
+					<div className="textgroup">
+					<TextField	
+					className="input"
+					type='password'
+					error={!!errors.password}
+					helperText={errors.password}
+					name="password"
+					onChange={(e)=>{handelChange(e,'password')}}
+					id="outlined-error"
+					label="패스워드"
+					/>
 					</div>
-					<button className="button do" type="submit" >
-						<img className="arrow"  src={arrow} alt="right-arrow" />
-					</button>
-					<input value={formData.emailcheck} type="text" style={{display:'none'}} name="emailcheck" />
+
+					<div className="textgroup">
+					<TextField
+					className="input"
+					error={!!errors.passwordCheck}
+					helperText={errors.passwordCheck}
+					type='password'
+					name="passwordCheck"
+					onChange={(e)=>{handelChange(e,'passwordCheck');passwordCheck()}}
+					id="outlined-error"
+					label="패스워드 확인"
+					/>
+					</div>
+			
+
+				</FormBar>
+					
+			</Container>	
+			</>
+			)
+		case 2:
+			return(
+				<>
+			<Header/>
+			<Container>
+			<FaArrowRight onClick={handleSubmit} className="right"/>
+			<div className="step">
+				<Steps step={step}/>				
+			</div>
+
+				
+				<div className="allow-container">
+						<h1>서비스 가입</h1>
+						<p>서비스 시작 및 가입을 위해 먼저</p>
+						<p>가입 및 정보 제공에 동의해 주세요.</p>
 				</div>
-			</form>
-		</Container>
-	);
+					<button className="all-btn">
+						<FaCheck onClick={handleAllCheck}/> 전체 동의 
+					</button>
+					<SelectLabel content={"test..."} checked={ServiceAllowCheck.service} title={"서비스이용약관"}/>
+					<SelectLabel content={"test..."} checked={ServiceAllowCheck.location} title={"서비스이용약관"}/>
+				
+				
+					
+			</Container>	
+			</>
+			)		
+			
+	
+		default:
+			return null;
+	}
+
 };
 
 export default SignUp;
+
+
+const SelectLabels = styled(motion.div)`
+	display:flex;
+	align-items :center;
+	justify-content:space-evenly;
+	width: 100%;
+	margin-bottom: 50px;
+	cursor: pointer;
+	.check {
+		margin : 10px;
+		color : ${props => props.checked ? "#0AD1F8" : ""}
+	}
+	button {
+		border: none;
+		cursor: pointer;
+		width:	40px;
+		height: 30px;
+		background-color: ${props=> props.theme.colors.blue};
+		color: white;
+	}
+	
+`;
+const SelectContainer = styled.div`
+
+
+`;
+
+const SelectLabel = ({ title , content , checked , onClick  }) => {
+	
+	return (
+		<>
+		<SelectLabels checked={checked}>
+			<FaCheck className="check"  />
+			<p>{title}</p>
+			<button>접기</button>
+		</SelectLabels>
+			{
+				checked && 
+				<div className="">
+					{content}
+				</div>
+			}
+			
+			
+		</>
+	)
+}
+

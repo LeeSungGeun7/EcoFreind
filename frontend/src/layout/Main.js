@@ -82,7 +82,7 @@ const Main = () => {
   
      
 
-const BottomUpTransition = useCallback(({children ,duration = 0.5 , delay ,...props}) => {
+const BottomUpTransition = useCallback(({children ,duration = 0.3 , delay ,...props}) => {
   return (
     <motion.div
     initial={{ y: 100, opacity: 0 }}
