@@ -4,6 +4,7 @@ import { Axios, EF_DOMAIN } from './utils';
 
 axios.defaults.withCredentials = true
 
+axios.interceptors.response.clear();
 
 export const authApi =  {
     signUP: async (request) => {
@@ -18,7 +19,7 @@ export const authApi =  {
         return response;
     },
       // 로그인 
-      memberLogin : async(id,pw) => {
+    memberLogin : async(id,pw) => {
         const requset = {
             email : id, 
             password : pw

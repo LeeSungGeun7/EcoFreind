@@ -379,7 +379,7 @@ async def read_root(
             user="로그인 작업"
         ) 
     else:
-        raise HTTPException(status_code=401, detail="Invalid credentials")  
+        raise HTTPException(status_code=422, detail="없는 유저")  
 
 
 @app.post('/user/password' , response_model= bool)

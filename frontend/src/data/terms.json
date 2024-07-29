@@ -1,0 +1,5 @@
+{
+        "service" : "service" ,
+        "location" : "JavaScript has no JSON interpreter that would accept this. It can only take JSON in a string. True, if you provided JSON inside a string literal then you could take this approach, but that's an unusual thing to do. Are you confusing JSON with actual object declarations in JavaScript?"
+           
+}

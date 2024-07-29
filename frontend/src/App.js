@@ -8,7 +8,7 @@ import { darkTheme, theme } from './styles/theme';
 
 const CarSerach = React.lazy(()=>(import('./pages/CarSearch')));
 const MyPage = React.lazy(()=>(import('./pages/MyPage')));
-const Login = React.lazy(()=>(import('./pages/Login')));
+const Login = React.lazy(()=>(import('./pages/Login/Login')));
 const SignUp = React.lazy(()=>(import('./pages/SignUp')));
 const Layout = lazy(()=>(import('./layout/Layout')));
 const ServiceCenter = lazy(()=>(import('./pages/ServiceCenter')));

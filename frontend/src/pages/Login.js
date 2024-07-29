@@ -8,6 +8,7 @@ import { authApi } from '../api/auth';
 import { useUserStore } from '../store/userState';
 import LoginLoading from '../Components/Loading/LoginLoading.tsx';
 import { useQuery } from '@tanstack/react-query'
+import Button from '../Components/atoms/Button';
 
     
 const Container = styled.div`
@@ -169,7 +170,8 @@ const Login = () => {
           <div className='top'>
             <div></div>
             <div className="title">LOGIN</div>
-            <Link className='sign' onClick={(e)=>{e.preventDefault(); navigate("/signup")}}>Sign Up</Link>
+            {/* <Link className='sign' onClick={(e)=>{e.preventDefault(); navigate("/signup")}}>Sign Up</Link> */}
+            <Button onClick={()=>{navigate('/signup')}} title='SignUp'/>
           </div>
 
           <input type="text" placeholder="이메일 입력" value={inputId} onChange={onChangeId} />
