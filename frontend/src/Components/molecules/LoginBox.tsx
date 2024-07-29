@@ -71,7 +71,7 @@ const LoginBox:React.FC<LoginFormProps> = ({onSubmit}:LoginFormProps) => {
         <Input onChange={(e)=> {setPassword(e.target.value)}} type="password" placeholder='비밀번호를 입력하세요' style={{padding:'10px',bgColor: 'white' , w: "94%"}}  />
         
         <SocialLoginBtn onClick={handleSubmit} radius="15px" color="white" name='로그인' w='black' bgColor='black' />
-        <SocialLoginBtn onClick={()=>{handleNavi('callback/kakao')}} icon='/kakaoLogin.webp' w={"100%"} name='카카오 로그인' bgColor='#fae100'/>
+        <SocialLoginBtn onClick={()=>{handleNavi(`https://kauth.kakao.com/oauth/authorize?client_id=${process.env.REACT_APP_KAKAO_REST_API_KEY}&redirect_uri=${process.env.REACT_APP_KAKAO_REDIRECT_URI}&response_type=code`)}} icon='/kakaoLogin.webp' w={"100%"} name='카카오 로그인' bgColor='#fae100'/>
     </Container>
   )
 }
